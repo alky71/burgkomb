@@ -40,11 +40,17 @@
     <div id="circle" onclick="incrementCounter()">Click</div>
 
     <script>
-        let count = 0;
+        let count = localStorage.getItem('count') ? parseInt(localStorage.getItem('count')) : 0;
+
+        // Відображення початкового значення лічильника
+        document.getElementById('counter').innerText = count;
 
         function incrementCounter() {
             count++;
             document.getElementById('counter').innerText = count;
+            // Зберігання значення в localStorage
+            localStorage.setItem('count', count);
+
             // Надсилаємо дані до бота (опціонально)
             Telegram.WebApp.sendData(count.toString());
         }
