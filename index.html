@@ -1,62 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter App</title>
+    <title>Telegram Mini App</title>
     <style>
-        /* Стили для центрування контенту */
         body {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #000;
-            color: #fff;
+            background-color: black;
+            color: white;
             font-family: Arial, sans-serif;
         }
-        #circle {
+        .nickname {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .counter {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .burger-button {
             width: 100px;
             height: 100px;
-            background-color: #00ff00; /* Зелений колір */
+            background-image: url('burger-icon.png'); /* замініть на шлях до вашого зображення */
+            background-size: cover;
+            border: none;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #000;
             cursor: pointer;
-        }
-        #counter {
-            font-size: 48px;
-            position: absolute;
-            top: 20px;
         }
     </style>
 </head>
 <body>
-    <div id="counter">0</div>
-    <div id="circle" onclick="incrementCounter()">Click</div>
+    <div class="nickname" id="nickname">Ім'я користувача</div>
+    <div class="counter" id="counter">0</div>
+    <button class="burger-button" onclick="incrementCounter()"></button>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        let count = localStorage.getItem('count') ? parseInt(localStorage.getItem('count')) : 0;
-
-        // Відображення початкового значення лічильника
-        document.getElementById('counter').innerText = count;
+        let count = 0;
 
         function incrementCounter() {
-            count++;
+            count += 1;
             document.getElementById('counter').innerText = count;
-            // Зберігання значення в localStorage
-            localStorage.setItem('count', count);
-
-            // Надсилаємо дані до бота (опціонально)
-            Telegram.WebApp.sendData(count.toString());
         }
 
-        // Ініціалізація Telegram WebApp
-        Telegram.WebApp.ready();
+        window.Telegram.WebApp.ready();
+
+        // Отримуємо ім'я користувача з Telegram Web Apps API
+        const user = window.Telegram.WebApp.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('nickname').innerText = user.first_name || user.username;
+        }
     </script>
 </body>
 </html>
