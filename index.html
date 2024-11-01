@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
         body {
@@ -18,9 +18,13 @@
         }
         .nickname {
             font-size: 20px;
-            margin-bottom: 10px;
+            margin-top: 20px;
             text-align: center;
             color: #FFD700; /* Золотистий колір для імені */
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .counter {
             font-size: 60px;
@@ -29,26 +33,24 @@
             text-align: center;
             color: white;
         }
-    .burger-button {
-        width: 200px;
-        height: 200px;
-        background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Прямий URL вашого зображення */
-        background-size: cover;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        outline: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Додаємо ці рядки */
-    .burger-button:focus {
-        outline: none;
-        box-shadow: none; /* Прибирає блакитне підсвічування */
-    }
-
+        .burger-button {
+            width: 250px; /* Збільшений розмір кнопки */
+            height: 250px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Прямий URL вашого зображення */
+            background-size: cover;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent; /* Прибирає бліки при натисканні */
+        }
+        .burger-button:focus, .burger-button:active {
+            outline: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -58,11 +60,16 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        let count = 0;
+        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
+
+        function updateCounterDisplay() {
+            document.getElementById('counter').innerText = count;
+        }
 
         function incrementCounter() {
             count += 1;
-            document.getElementById('counter').innerText = count;
+            updateCounterDisplay();
+            localStorage.setItem('counter', count); // Зберігаємо значення в localStorage
         }
 
         window.Telegram.WebApp.ready();
@@ -72,6 +79,9 @@
         if (user) {
             document.getElementById('nickname').innerText = user.first_name || user.username;
         }
+
+        // Ініціалізуємо початкове значення лічильника з localStorage
+        updateCounterDisplay();
     </script>
 </body>
 </html>
