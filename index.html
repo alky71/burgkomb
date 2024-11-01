@@ -20,7 +20,7 @@
             font-size: 20px;
             margin-top: 20px;
             text-align: center;
-            color: #FFD700; /* Золотистий колір для імені */
+            color: #FFD700;
             position: absolute;
             top: 10px;
             left: 50%;
@@ -34,9 +34,9 @@
             color: white;
         }
         .burger-button {
-            width: 250px; /* Збільшений розмір кнопки */
+            width: 250px;
             height: 250px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Прямий URL вашого зображення */
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
             background-size: cover;
             border: none;
             border-radius: 50%;
@@ -45,7 +45,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            -webkit-tap-highlight-color: transparent; /* Прибирає бліки при натисканні */
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease; /* Додаємо ефект збільшення */
+        }
+        .burger-button:active {
+            transform: scale(1.1); /* Ефект збільшення при натисканні */
         }
         .burger-button:focus, .burger-button:active {
             outline: none;
@@ -69,18 +73,16 @@
         function incrementCounter() {
             count += 1;
             updateCounterDisplay();
-            localStorage.setItem('counter', count); // Зберігаємо значення в localStorage
+            localStorage.setItem('counter', count);
         }
 
         window.Telegram.WebApp.ready();
 
-        // Отримуємо ім'я користувача з Telegram Web Apps API
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         if (user) {
             document.getElementById('nickname').innerText = user.first_name || user.username;
         }
 
-        // Ініціалізуємо початкове значення лічильника з localStorage
         updateCounterDisplay();
     </script>
 </body>
