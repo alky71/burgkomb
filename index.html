@@ -29,19 +29,26 @@
             text-align: center;
             color: white;
         }
-        .burger-button {
-            width: 200px;
-            height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Прямий URL вашого зображення */
-            background-size: cover;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .burger-button {
+        width: 200px;
+        height: 200px;
+        background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Прямий URL вашого зображення */
+        background-size: cover;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Додаємо ці рядки */
+    .burger-button:focus {
+        outline: none;
+        box-shadow: none; /* Прибирає блакитне підсвічування */
+    }
+
     </style>
 </head>
 <body>
