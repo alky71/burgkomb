@@ -9,7 +9,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: black;
@@ -17,29 +17,35 @@
             font-family: Arial, sans-serif;
         }
         .nickname {
-            font-size: 24px;
-            margin-top: 20px;
+            font-size: 20px;
+            margin-bottom: 10px;
             text-align: center;
+            color: #FFD700; /* Золотистий колір */
         }
         .counter {
-            font-size: 48px;
-            margin-top: 10px;
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 20px;
             text-align: center;
+            color: white;
         }
         .burger-button {
-            width: 250px;
-            height: 250px;
-            background-image: url('https://imgur.com/VtVDfFc');
+            width: 200px;
+            height: 200px;
+            background-image: url('https://imgur.com/VtVDfFc'); /* Замініть на URL вашого зображення */
             background-size: cover;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            margin-top: 20px;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
-    <div class="nickname" id="nickname">Ім'я користувача</div>
+    <div class="nickname" id="nickname">My nick</div>
     <div class="counter" id="counter">0</div>
     <button class="burger-button" onclick="incrementCounter()"></button>
 
