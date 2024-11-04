@@ -1,141 +1,48 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        .nickname {
-            font-size: 20px;
-            margin-top: 20px;
-            text-align: center;
-            color: #FFD700;
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .counter {
-            font-size: 60px;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-        }
-        .burger-button {
-            width: 250px;
-            height: 250px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
-            background-size: cover;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s ease;
-            margin-top: 20px;
-        }
-        .burger-button:active {
-            transform: scale(1.1);
-        }
-        .burger-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-        /* Стиль для NFT екрану */
-        .nft-container {
+        /* Existing styles */
+
+        /* Style for Tasks screen */
+        .tasks-container {
             display: none;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
             color: white;
             margin-top: 20px;
         }
-        .nft-image {
-            width: 200px;
-            height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* URL зображення NFT */
-            background-size: cover;
-            border-radius: 50%;
-            margin-right: 20px;
+        .task {
+            font-size: 18px;
+            margin: 10px 0;
         }
-        .nft-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .nft-price {
-            font-size: 30px;
-            color: #FFD700;
-            margin-bottom: 10px;
-        }
-        .buy-button {
+        .claim-button {
             background-color: #00FF00;
             color: black;
-            font-size: 20px;
-            padding: 10px 20px;
+            font-size: 16px;
+            padding: 8px 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             outline: none;
             -webkit-tap-highlight-color: transparent;
-        }
-        .buy-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-        /* Повідомлення про помилку */
-        .error-message {
-            color: red;
-            font-size: 16px;
-            margin-top: 10px;
-            display: none;
-        }
-        .menu {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background-color: #333;
-        }
-        .menu button {
-            width: 50%;
-            background-color: #444;
-            border: none;
-            color: white;
-            font-size: 20px;
-            padding: 15px 0;
-            cursor: pointer;
-            outline: none;
-        }
-        .menu button:focus {
-            outline: none;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname">My nick</div>
 
-    <!-- Екран Clicker -->
+    <!-- Clicker Screen -->
     <div id="clickerScreen">
         <div class="counter" id="counter">0</div>
         <button class="burger-button" onclick="incrementCounter()"></button>
     </div>
 
-    <!-- Екран NFT -->
+    <!-- NFT Screen -->
     <div id="nftScreen" class="nft-container">
         <div class="nft-image"></div>
         <div class="nft-info">
@@ -145,10 +52,23 @@
         </div>
     </div>
 
-    <!-- Меню внизу екрану -->
+    <!-- Tasks Screen -->
+    <div id="tasksScreen" class="tasks-container">
+        <div class="task" id="dailyRewardTask">
+            Daily login reward: <span id="dailyRewardAmount">0</span> coins
+            <button class="claim-button" onclick="claimDailyReward()">Claim</button>
+        </div>
+        <div class="task" id="channelSubscriptionTask">
+            Subscribe to channel
+            <button class="claim-button" onclick="claimChannelReward()">Check Subscription</button>
+        </div>
+    </div>
+
+    <!-- Bottom Menu -->
     <div class="menu">
         <button onclick="showClicker()">Clicker</button>
         <button onclick="showNFT()">NFT</button>
+        <button onclick="showTasks()">Tasks</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -156,6 +76,8 @@
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
         let nftPrice = 1000;
         let hasNFT = false;
+        let dailyStreak = localStorage.getItem('dailyStreak') ? parseInt(localStorage.getItem('dailyStreak')) : 0;
+        let lastLogin = localStorage.getItem('lastLogin') ? new Date(localStorage.getItem('lastLogin')) : null;
 
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
@@ -170,18 +92,27 @@
         function showClicker() {
             document.getElementById('clickerScreen').style.display = 'flex';
             document.getElementById('nftScreen').style.display = 'none';
+            document.getElementById('tasksScreen').style.display = 'none';
         }
 
         function showNFT() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'flex';
+            document.getElementById('tasksScreen').style.display = 'none';
+        }
+
+        function showTasks() {
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'none';
+            document.getElementById('tasksScreen').style.display = 'flex';
+            updateDailyReward();
         }
 
         function buyOrSellNFT() {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.style.display = 'none';
 
-            if (!hasNFT) { // Купівля
+            if (!hasNFT) { // Buy
                 if (count >= nftPrice) {
                     count -= nftPrice;
                     hasNFT = true;
@@ -191,7 +122,7 @@
                 } else {
                     errorMessage.style.display = 'block';
                 }
-            } else { // Продаж
+            } else { // Sell
                 count += nftPrice;
                 hasNFT = false;
                 document.getElementById('buyButton').innerText = 'BUY';
@@ -200,14 +131,12 @@
             }
         }
 
-        // Функція для зміни ціни NFT кожну секунду
         function changeNFTPrice() {
-            nftPrice += Math.floor(Math.random() * 21) - 10; // Зміна ціни від -10 до +10
-            nftPrice = Math.max(nftPrice, 1); // Мінімальна ціна 1
+            nftPrice += Math.floor(Math.random() * 21) - 10;
+            nftPrice = Math.max(nftPrice, 1);
             document.getElementById('nftPrice').innerText = nftPrice;
         }
 
-        // Запуск зміни ціни кожну секунду
         setInterval(changeNFTPrice, 1000);
 
         window.Telegram.WebApp.ready();
@@ -218,6 +147,57 @@
         }
 
         updateCounterDisplay();
+
+        function updateDailyReward() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (lastLogin && today - lastLogin === 86400000) { // Visited yesterday
+                dailyStreak = Math.min(dailyStreak + 1, 10);
+            } else if (!lastLogin || today - lastLogin > 86400000) { // Didn't visit for a few days
+                dailyStreak = 1;
+            }
+
+            localStorage.setItem('dailyStreak', dailyStreak);
+            localStorage.setItem('lastLogin', today);
+
+            const reward = dailyStreak * 100;
+            document.getElementById('dailyRewardAmount').innerText = reward;
+        }
+
+        function claimDailyReward() {
+            const reward = dailyStreak * 100;
+            count += reward;
+            updateCounterDisplay();
+            localStorage.setItem('counter', count);
+            alert('You have received ' + reward + ' coins for daily login!');
+        }
+
+        async function claimChannelReward() {
+            try {
+                const isSubscribed = await checkUserSubscription();
+                if (isSubscribed) {
+                    count += 500;
+                    updateCounterDisplay();
+                    localStorage.setItem('counter', count);
+                    alert('You have received 500 coins for subscribing to the channel!');
+                } else {
+                    alert('Please subscribe to the channel to receive the reward.');
+                }
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+            }
+        }
+
+        function checkUserSubscription() {
+            return new Promise((resolve, reject) => {
+                // Simulating API call to check channel subscription
+                setTimeout(() => {
+                    const subscribed = Math.random() > 0.5; // Simulating: 50% chance of subscription
+                    resolve(subscribed);
+                }, 1000);
+            });
+        }
     </script>
 </body>
 </html>
