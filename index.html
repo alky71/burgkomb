@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* Загальний стиль */
         body {
             display: flex;
             flex-direction: column;
@@ -27,31 +26,12 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        .nav-buttons {
-            position: absolute;
-            bottom: 10px;
-            display: flex;
-            gap: 20px;
-        }
-        .nav-button {
-            padding: 10px 20px;
-            font-size: 18px;
-            color: white;
-            background-color: #333;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        /* Clicker */
-        .clicker-screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
         .counter {
             font-size: 60px;
             font-weight: bold;
             margin-bottom: 20px;
+            text-align: center;
+            color: white;
         }
         .burger-button {
             width: 250px;
@@ -61,127 +41,170 @@
             border: none;
             border-radius: 50%;
             cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
             transition: transform 0.1s ease;
         }
         .burger-button:active {
             transform: scale(1.1);
         }
-        /* NFT */
-        .nft-screen {
+        .burger-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        /* Стиль для NFT екрану */
+        .nft-container {
             display: none;
             flex-direction: column;
             align-items: center;
+            color: white;
+            margin-top: 20px;
         }
         .nft-title {
-            font-size: 50px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 10px;
         }
         .nft-image {
             width: 200px;
             height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* URL зображення NFT */
             background-size: cover;
             border-radius: 50%;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .nft-price {
-            font-size: 40px;
+            font-size: 30px;
+            color: #FFD700;
             margin-bottom: 10px;
         }
-        .buy-sell-button {
-            padding: 10px 20px;
-            font-size: 18px;
-            color: black;
+        .buy-button {
             background-color: #00FF00;
+            color: black;
+            font-size: 20px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 5px;
             cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .buy-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        /* Повідомлення про помилку */
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none;
+        }
+        .menu {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+            padding: 10px 0;
+        }
+        .menu button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            outline: none;
+        }
+        .menu button:focus {
+            outline: none;
         }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname">My nick</div>
+
     <!-- Екран Clicker -->
-    <div class="clicker-screen" id="clickerScreen">
+    <div id="clickerScreen">
         <div class="counter" id="counter">0</div>
         <button class="burger-button" onclick="incrementCounter()"></button>
     </div>
+
     <!-- Екран NFT -->
-    <div class="nft-screen" id="nftScreen">
+    <div id="nftScreen" class="nft-container">
         <div class="nft-title">NFT</div>
         <div class="nft-image"></div>
         <div class="nft-price" id="nftPrice">1000</div>
-        <button class="buy-sell-button" id="buySellButton" onclick="buyOrSellNFT()">BUY</button>
+        <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
+        <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
     </div>
-    <!-- Кнопки навігації -->
-    <div class="nav-buttons">
-        <button class="nav-button" onclick="showScreen('clicker')">Clicker</button>
-        <button class="nav-button" onclick="showScreen('nft')">NFT</button>
+
+    <!-- Меню внизу екрану -->
+    <div class="menu">
+        <button onclick="showClicker()">Clicker</button>
+        <button onclick="showNFT()">NFT</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 0;
         let nftPrice = 1000;
-        let ownsNFT = false;
+        let hasNFT = false;
 
-        // Функція оновлення інтерфейсу балансу
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
         }
 
         function incrementCounter() {
             count += 1;
-            balance += 1;
             updateCounterDisplay();
             localStorage.setItem('counter', count);
-            localStorage.setItem('balance', balance);
         }
 
-        // Функції для перемикання екранів
-        function showScreen(screen) {
-            document.getElementById('clickerScreen').style.display = (screen === 'clicker') ? 'flex' : 'none';
-            document.getElementById('nftScreen').style.display = (screen === 'nft') ? 'flex' : 'none';
+        function showClicker() {
+            document.getElementById('clickerScreen').style.display = 'flex';
+            document.getElementById('nftScreen').style.display = 'none';
         }
 
-        // Функція для динамічної зміни ціни NFT
-        function updateNFTPrice() {
-            const change = Math.floor(Math.random() * 101) - 50; // Випадкове число від -50 до +50
-            nftPrice = Math.max(500, nftPrice + change); // Мінімум 500
-            document.getElementById('nftPrice').innerText = nftPrice;
+        function showNFT() {
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'flex';
         }
 
-        // Функція купівлі/продажу NFT
         function buyOrSellNFT() {
-            if (!ownsNFT) { // Купівля
-                if (balance >= nftPrice) {
-                    balance -= nftPrice;
-                    ownsNFT = true;
-                    document.getElementById('buySellButton').innerText = 'SELL';
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+
+            if (!hasNFT) { // Купівля
+                if (count >= nftPrice) {
+                    count -= nftPrice;
+                    hasNFT = true;
+                    document.getElementById('buyButton').innerText = 'SELL';
+                    updateCounterDisplay();
+                    localStorage.setItem('counter', count);
                 } else {
-                    alert("Недостатньо коштів для покупки NFT!");
+                    errorMessage.style.display = 'block';
                 }
             } else { // Продаж
-                balance += nftPrice;
-                ownsNFT = false;
-                document.getElementById('buySellButton').innerText = 'BUY';
+                count += nftPrice;
+                hasNFT = false;
+                document.getElementById('buyButton').innerText = 'BUY';
+                updateCounterDisplay();
+                localStorage.setItem('counter', count);
             }
-            localStorage.setItem('balance', balance);
-            updateCounterDisplay();
         }
 
-        // Запускаємо динамічне оновлення ціни кожну секунду
-        setInterval(updateNFTPrice, 1000);
-
-        // Ініціалізація інтерфейсу
         window.Telegram.WebApp.ready();
+
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         if (user) {
             document.getElementById('nickname').innerText = user.first_name || user.username;
         }
+
         updateCounterDisplay();
-        showScreen('clicker');
     </script>
 </body>
 </html>
