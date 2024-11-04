@@ -26,12 +26,12 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        .counter {
+        .counter, .nft-container {
             font-size: 60px;
             font-weight: bold;
-            margin-bottom: 20px;
             text-align: center;
             color: white;
+            display: none; /* Сховаємо елементи спочатку */
         }
         .burger-button {
             width: 250px;
@@ -42,29 +42,79 @@
             border-radius: 50%;
             cursor: pointer;
             outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: none;
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s ease; /* Додаємо ефект збільшення */
+            transition: transform 0.1s ease;
         }
         .burger-button:active {
-            transform: scale(1.1); /* Ефект збільшення при натисканні */
+            transform: scale(1.1);
         }
-        .burger-button:focus, .burger-button:active {
-            outline: none;
-            box-shadow: none;
+        .menu-toggle {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .menu-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            color: white;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nft-container img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .nft-price {
+            font-size: 30px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .buy-sell-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            color: black;
+            background-color: yellow;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname">My nick</div>
-    <div class="counter" id="counter">0</div>
-    <button class="burger-button" onclick="incrementCounter()"></button>
+
+    <!-- Counter Clicker Menu -->
+    <div id="clicker-menu">
+        <div class="counter" id="counter">0</div>
+        <button class="burger-button" onclick="incrementCounter()">+</button>
+    </div>
+
+    <!-- NFT Menu -->
+    <div id="nft-menu" class="nft-container">
+        <h1>NFT</h1>
+        <img src="https://i.imgur.com/VtVDfFc.png" alt="NFT Image">
+        <div class="nft-price" id="nft-price">1000</div>
+        <button class="buy-sell-button" id="buy-sell-button" onclick="toggleBuySell()">BUY</button>
+    </div>
+
+    <!-- Menu Toggle Buttons -->
+    <div class="menu-toggle">
+        <button class="menu-button" onclick="showClickerMenu()">Clicker</button>
+        <button class="menu-button" onclick="showNFTMenu()">NFT</button>
+    </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
+        let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 10000; // Початковий баланс
+        let nftPrice = 1000;
+        let hasNFT = false;
 
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
@@ -76,14 +126,53 @@
             localStorage.setItem('counter', count);
         }
 
+        // Перемикаємося на Clicker меню
+        function showClickerMenu() {
+            document.getElementById('clicker-menu').style.display = 'block';
+            document.getElementById('nft-menu').style.display = 'none';
+        }
+
+        // Перемикаємося на NFT меню
+        function showNFTMenu() {
+            document.getElementById('clicker-menu').style.display = 'none';
+            document.getElementById('nft-menu').style.display = 'block';
+        }
+
+        // Функція для покупки/продажу NFT
+        function toggleBuySell() {
+            if (hasNFT) {
+                balance += nftPrice;
+                hasNFT = false;
+                document.getElementById('buy-sell-button').innerText = "BUY";
+            } else {
+                if (balance >= nftPrice) {
+                    balance -= nftPrice;
+                    hasNFT = true;
+                    document.getElementById('buy-sell-button').innerText = "SELL";
+                } else {
+                    alert("Not enough balance");
+                }
+            }
+            localStorage.setItem('balance', balance);
+        }
+
+        // Динамічна зміна ціни NFT
+        setInterval(() => {
+            nftPrice += Math.floor(Math.random() * 20 - 10); // Рандомна зміна ціни
+            document.getElementById('nft-price').innerText = nftPrice;
+        }, 1000);
+
         window.Telegram.WebApp.ready();
 
+        // Отримуємо ім'я користувача з Telegram Web Apps API
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         if (user) {
             document.getElementById('nickname').innerText = user.first_name || user.username;
         }
 
+        // Ініціалізуємо початкове значення лічильника та меню
         updateCounterDisplay();
+        showClickerMenu();
     </script>
 </body>
 </html>
