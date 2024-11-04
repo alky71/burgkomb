@@ -5,31 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* Existing styles */
-
-        /* Style for Tasks screen */
-        .tasks-container {
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .nickname {
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #FFD700;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .counter {
+            font-size: 60px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+        }
+        .burger-button {
+            width: 250px;
+            height: 250px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease;
+            margin-top: 20px;
+        }
+        .burger-button:active {
+            transform: scale(1.1);
+        }
+        .burger-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .nft-container, .tasks-container {
             display: none;
             flex-direction: column;
             align-items: center;
             color: white;
             margin-top: 20px;
         }
-        .task {
-            font-size: 18px;
-            margin: 10px 0;
+        .nft-image {
+            width: 200px;
+            height: 200px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border-radius: 50%;
+            margin-right: 20px;
         }
-        .claim-button {
+        .nft-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nft-price {
+            font-size: 30px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        .buy-button, .claim-button {
             background-color: #00FF00;
             color: black;
-            font-size: 16px;
-            padding: 8px 16px;
+            font-size: 20px;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             outline: none;
             -webkit-tap-highlight-color: transparent;
-            margin-top: 5px;
+        }
+        .buy-button:focus, .claim-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none;
+        }
+        .menu {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+        }
+        .menu button {
+            width: 33.33%;
+            background-color: #444;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 15px 0;
+            cursor: pointer;
+            outline: none;
+        }
+        .menu button:focus {
+            outline: none;
+        }
+        .task {
+            font-size: 18px;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -152,9 +247,9 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            if (lastLogin && today - lastLogin === 86400000) { // Visited yesterday
+            if (lastLogin && today - lastLogin === 86400000) {
                 dailyStreak = Math.min(dailyStreak + 1, 10);
-            } else if (!lastLogin || today - lastLogin > 86400000) { // Didn't visit for a few days
+            } else if (!lastLogin || today - lastLogin > 86400000) {
                 dailyStreak = 1;
             }
 
@@ -177,25 +272,21 @@
             try {
                 const isSubscribed = await checkUserSubscription();
                 if (isSubscribed) {
-                    count += 500;
+                    count += 1000;
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
-                    alert('You have received 500 coins for subscribing to the channel!');
+                    alert('You have received 1000 coins for subscribing!');
                 } else {
-                    alert('Please subscribe to the channel to receive the reward.');
+                    alert('Please subscribe to the channel to claim the reward.');
                 }
             } catch (error) {
-                console.error('Error checking subscription:', error);
+                alert('Error checking subscription. Please try again later.');
             }
         }
 
-        function checkUserSubscription() {
-            return new Promise((resolve, reject) => {
-                // Simulating API call to check channel subscription
-                setTimeout(() => {
-                    const subscribed = Math.random() > 0.5; // Simulating: 50% chance of subscription
-                    resolve(subscribed);
-                }, 1000);
+        async function checkUserSubscription() {
+            return new Promise((resolve) => {
+                setTimeout(() => resolve(true), 1000);
             });
         }
     </script>
