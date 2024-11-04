@@ -29,7 +29,6 @@
         .counter {
             font-size: 60px;
             font-weight: bold;
-            margin-bottom: 20px;
             text-align: center;
             color: white;
         }
@@ -47,6 +46,7 @@
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
             transition: transform 0.1s ease;
+            margin-top: 20px;
         }
         .burger-button:active {
             transform: scale(1.1);
@@ -58,14 +58,10 @@
         /* Стиль для NFT екрану */
         .nft-container {
             display: none;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             color: white;
             margin-top: 20px;
-        }
-        .nft-title {
-            font-size: 40px;
-            margin-bottom: 10px;
         }
         .nft-image {
             width: 200px;
@@ -73,7 +69,12 @@
             background-image: url('https://i.imgur.com/VtVDfFc.png'); /* URL зображення NFT */
             background-size: cover;
             border-radius: 50%;
-            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+        .nft-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .nft-price {
             font-size: 30px;
@@ -109,13 +110,14 @@
             display: flex;
             justify-content: space-around;
             background-color: #333;
-            padding: 10px 0;
         }
         .menu button {
-            background-color: transparent;
+            width: 50%;
+            background-color: #444;
             border: none;
             color: white;
             font-size: 20px;
+            padding: 15px 0;
             cursor: pointer;
             outline: none;
         }
@@ -135,11 +137,12 @@
 
     <!-- Екран NFT -->
     <div id="nftScreen" class="nft-container">
-        <div class="nft-title">NFT</div>
         <div class="nft-image"></div>
-        <div class="nft-price" id="nftPrice">1000</div>
-        <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
-        <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
+        <div class="nft-info">
+            <div class="nft-price" id="nftPrice">1000</div>
+            <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
+            <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
+        </div>
     </div>
 
     <!-- Меню внизу екрану -->
@@ -196,6 +199,16 @@
                 localStorage.setItem('counter', count);
             }
         }
+
+        // Функція для зміни ціни NFT кожну секунду
+        function changeNFTPrice() {
+            nftPrice += Math.floor(Math.random() * 21) - 10; // Зміна ціни від -10 до +10
+            nftPrice = Math.max(nftPrice, 1); // Мінімальна ціна 1
+            document.getElementById('nftPrice').innerText = nftPrice;
+        }
+
+        // Запуск зміни ціни кожну секунду
+        setInterval(changeNFTPrice, 1000);
 
         window.Telegram.WebApp.ready();
 
