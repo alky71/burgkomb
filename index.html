@@ -58,52 +58,48 @@
         .nft-container, .tasks-container {
             display: none;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             color: white;
             margin-top: 20px;
+            width: 90%;
         }
-        .nft-image {
-            width: 200px;
-            height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
-            background-size: cover;
-            border-radius: 50%;
-            margin-right: 20px;
-        }
-        .nft-info {
+        .task {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            width: 100%;
+            font-size: 18px;
+            margin: 10px 0;
         }
-        .nft-price {
-            font-size: 30px;
-            color: #FFD700;
-            margin-bottom: 10px;
-        }
-        .buy-button, .claim-button {
+        .claim-button {
             background-color: #00FF00;
             color: black;
-            font-size: 20px;
-            padding: 10px 20px;
+            font-size: 16px;
+            padding: 5px 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .buy-button:focus, .claim-button:focus {
+        .claim-button:focus {
             outline: none;
             box-shadow: none;
         }
-        .error-message {
-            color: red;
+        .error-message, .success-message {
+            color: white;
             font-size: 16px;
-            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
             display: none;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
         }
         .menu {
             position: fixed;
-            bottom: 0;
+            bottom: 50px;
             width: 100%;
             display: flex;
             justify-content: space-around;
@@ -121,10 +117,6 @@
         }
         .menu button:focus {
             outline: none;
-        }
-        .task {
-            font-size: 18px;
-            margin: 10px 0;
         }
     </style>
 </head>
@@ -150,11 +142,11 @@
     <!-- Tasks Screen -->
     <div id="tasksScreen" class="tasks-container">
         <div class="task" id="dailyRewardTask">
-            Daily login reward: <span id="dailyRewardAmount">0</span> coins
+            <span>Daily login reward: <span id="dailyRewardAmount">0</span> coins</span>
             <button class="claim-button" onclick="claimDailyReward()" id="claimDailyButton">Claim</button>
         </div>
         <div class="task" id="channelSubscriptionTask">
-            Subscribe to channel
+            <span>Subscribe to channel</span>
             <button class="claim-button" onclick="claimChannelReward()" id="claimChannelButton">Check Subscription</button>
         </div>
     </div>
@@ -165,6 +157,9 @@
         <button onclick="showNFT()">NFT</button>
         <button onclick="showTasks()">Tasks</button>
     </div>
+
+    <!-- Message Container -->
+    <div id="messageContainer" class="success-message"></div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
@@ -228,7 +223,7 @@
         }
 
         function changeNFTPrice() {
-            nftPrice += Math.floor(Math.random() * 25) - 5;
+            nftPrice += Math.floor(Math.random() * 21) - 10;
             nftPrice = Math.max(nftPrice, 1);
             document.getElementById('nftPrice').innerText = nftPrice;
         }
@@ -260,7 +255,6 @@
             const reward = dailyStreak * 100;
             document.getElementById('dailyRewardAmount').innerText = reward;
 
-            // Disable the daily reward button if already claimed today
             document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
         }
 
@@ -272,7 +266,7 @@
 
             document.getElementById('claimDailyButton').disabled = true;
             localStorage.setItem('dailyRewardClaimed', 'true');
-            alert(`You have claimed ${reward} coins as a daily reward!`);
+            displayMessage(`You have claimed ${reward} coins as a daily reward!`);
         }
 
         async function claimChannelReward() {
@@ -284,14 +278,14 @@
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
                     localStorage.setItem('channelRewardClaimed', 'true');
-                    alert('You have received 1000 coins for subscribing!');
+                    displayMessage('You have received 1000 coins for subscribing!');
                 } else if (localStorage.getItem('channelRewardClaimed')) {
-                    alert('You have already claimed this reward.');
+                    displayMessage('You have already claimed this reward.');
                 } else {
-                    alert('Please subscribe to the channel to claim the reward.');
+                    displayMessage('Please subscribe to the channel to claim the reward.');
                 }
             } catch (error) {
-                alert('Error checking subscription. Please try again later.');
+                displayMessage('Error checking subscription. Please try again later.');
             }
         }
 
@@ -304,6 +298,16 @@
         function checkTaskCompletion() {
             document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
             document.getElementById('claimChannelButton').disabled = localStorage.getItem('channelRewardClaimed') === 'true';
+        }
+
+        function displayMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerText = message;
+            messageContainer.style.display = 'block';
+
+            setTimeout(() => {
+                messageContainer.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>
