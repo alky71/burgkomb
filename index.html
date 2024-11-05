@@ -151,11 +151,11 @@
     <div id="tasksScreen" class="tasks-container">
         <div class="task" id="dailyRewardTask">
             Daily login reward: <span id="dailyRewardAmount">0</span> coins
-            <button class="claim-button" onclick="claimDailyReward()">Claim</button>
+            <button class="claim-button" onclick="claimDailyReward()" id="claimDailyButton">Claim</button>
         </div>
         <div class="task" id="channelSubscriptionTask">
             Subscribe to channel
-            <button class="claim-button" onclick="claimChannelReward()">Check Subscription</button>
+            <button class="claim-button" onclick="claimChannelReward()" id="claimChannelButton">Check Subscription</button>
         </div>
     </div>
 
@@ -201,13 +201,14 @@
             document.getElementById('nftScreen').style.display = 'none';
             document.getElementById('tasksScreen').style.display = 'flex';
             updateDailyReward();
+            checkTaskCompletion();
         }
 
         function buyOrSellNFT() {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.style.display = 'none';
 
-            if (!hasNFT) { // Buy
+            if (!hasNFT) {
                 if (count >= nftPrice) {
                     count -= nftPrice;
                     hasNFT = true;
@@ -217,7 +218,7 @@
                 } else {
                     errorMessage.style.display = 'block';
                 }
-            } else { // Sell
+            } else {
                 count += nftPrice;
                 hasNFT = false;
                 document.getElementById('buyButton').innerText = 'BUY';
@@ -258,6 +259,9 @@
 
             const reward = dailyStreak * 100;
             document.getElementById('dailyRewardAmount').innerText = reward;
+
+            // Disable the daily reward button if already claimed today
+            document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
         }
 
         function claimDailyReward() {
@@ -265,17 +269,24 @@
             count += reward;
             updateCounterDisplay();
             localStorage.setItem('counter', count);
-            alert('You have received ' + reward + ' coins for daily login!');
+
+            document.getElementById('claimDailyButton').disabled = true;
+            localStorage.setItem('dailyRewardClaimed', 'true');
+            alert(`You have claimed ${reward} coins as a daily reward!`);
         }
 
         async function claimChannelReward() {
             try {
                 const isSubscribed = await checkUserSubscription();
-                if (isSubscribed) {
+
+                if (isSubscribed && !localStorage.getItem('channelRewardClaimed')) {
                     count += 1000;
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
+                    localStorage.setItem('channelRewardClaimed', 'true');
                     alert('You have received 1000 coins for subscribing!');
+                } else if (localStorage.getItem('channelRewardClaimed')) {
+                    alert('You have already claimed this reward.');
                 } else {
                     alert('Please subscribe to the channel to claim the reward.');
                 }
@@ -288,6 +299,11 @@
             return new Promise((resolve) => {
                 setTimeout(() => resolve(true), 1000);
             });
+        }
+
+        function checkTaskCompletion() {
+            document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
+            document.getElementById('claimChannelButton').disabled = localStorage.getItem('channelRewardClaimed') === 'true';
         }
     </script>
 </body>
