@@ -31,7 +31,7 @@
             height: 4px;
             background-color: #0000FF;
             position: absolute;
-            top: 40px;
+            top: 50px;
             left: 0;
         }
         .counter {
@@ -59,12 +59,6 @@
         .burger-button:active {
             transform: scale(1.1);
         }
-        .burger-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        /* NFT Screen Styles */
         .nft-container {
             display: none;
             flex-direction: column;
@@ -89,7 +83,6 @@
         .nft-image {
             width: 200px;
             height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Replace with your NFT image URL */
             background-size: cover;
             border-radius: 50%;
             margin-right: 20px;
@@ -104,6 +97,10 @@
             color: #FFD700;
             margin-bottom: 10px;
         }
+        .percentage-change {
+            font-size: 20px;
+            font-weight: bold;
+        }
         .buy-button {
             background-color: #ccff00;
             color: black;
@@ -113,54 +110,6 @@
             border-radius: 5px;
             cursor: pointer;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .buy-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        .tasks-container {
-            display: none;
-            flex-direction: column;
-            align-items: flex-start;
-            color: white;
-            margin-top: 20px;
-            width: 90%;
-        }
-        .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            font-size: 18px;
-            margin: 10px 0;
-        }
-        .claim-button {
-            background-color: #00FF00;
-            color: black;
-            font-size: 16px;
-            padding: 5px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .claim-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-        .error-message, .success-message {
-            color: white;
-            font-size: 16px;
-            text-align: center;
-            padding: 10px;
-            display: none;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
         }
         .menu {
             position: fixed;
@@ -178,15 +127,11 @@
             font-size: 20px;
             padding: 15px 0;
             cursor: pointer;
-            outline: none;
-        }
-        .menu button:focus {
-            outline: none;
         }
     </style>
 </head>
 <body>
-    <div class="nickname" id="nickname">My nick</div>
+    <div class="nickname" id="nickname">Loading...</div>
     <div class="blue-line"></div>
 
     <!-- Clicker Screen -->
@@ -198,24 +143,20 @@
     <!-- NFT Screen -->
     <div id="nftScreen" class="nft-container">
         <div class="nft-box">
-            <div class="nft-image"></div>
+            <div class="nft-image" style="background-image: url('https://i.imgur.com/VtVDfFc.png');"></div>
             <div class="nft-info">
-                <div class="nft-price" id="nftPrice">1000</div>
-                <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
+                <div class="nft-price" id="nftPrice1">1000</div>
+                <div id="nftChange1" class="percentage-change"></div>
+                <button class="buy-button" onclick="buyOrSellNFT(1)" id="buyButton1">BUY</button>
             </div>
         </div>
-        <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
-    </div>
-
-    <!-- Tasks Screen -->
-    <div id="tasksScreen" class="tasks-container">
-        <div class="task" id="dailyRewardTask">
-            <span>Daily login reward: <span id="dailyRewardAmount">0</span> coins</span>
-            <button class="claim-button" onclick="claimDailyReward()" id="claimDailyButton">Claim</button>
-        </div>
-        <div class="task" id="channelSubscriptionTask">
-            <span>Subscribe to channel</span>
-            <button class="claim-button" onclick="claimChannelReward()" id="claimChannelButton">Check Subscription</button>
+        <div class="nft-box">
+            <div class="nft-image" style="background-image: url('https://i.imgur.com/VtVDfFc.png');"></div>
+            <div class="nft-info">
+                <div class="nft-price" id="nftPrice2">2000</div>
+                <div id="nftChange2" class="percentage-change"></div>
+                <button class="buy-button" onclick="buyOrSellNFT(2)" id="buyButton2">BUY</button>
+            </div>
         </div>
     </div>
 
@@ -223,26 +164,21 @@
     <div class="menu">
         <button onclick="showClicker()">Clicker</button>
         <button onclick="showNFT()">NFT</button>
-        <button onclick="showTasks()">Tasks</button>
     </div>
-
-    <!-- Message Container -->
-    <div id="messageContainer" class="success-message"></div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let nftPrice = 1000;
-        let hasNFT = false;
-        let dailyStreak = localStorage.getItem('dailyStreak') ? parseInt(localStorage.getItem('dailyStreak')) : 0;
-        let lastLogin = localStorage.getItem('lastLogin') ? new Date(localStorage.getItem('lastLogin')) : null;
+        let count = parseInt(localStorage.getItem('counter') || 0);
+        let nftPrices = [1000, 2000];
+        let nftOwned = [localStorage.getItem('hasNFT1') === 'true', localStorage.getItem('hasNFT2') === 'true'];
+        let nftBasePrices = [1000, 2000];
 
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
         }
 
         function incrementCounter() {
-            count += 1;
+            count++;
             updateCounterDisplay();
             localStorage.setItem('counter', count);
         }
@@ -250,129 +186,64 @@
         function showClicker() {
             document.getElementById('clickerScreen').style.display = 'flex';
             document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('tasksScreen').style.display = 'none';
         }
 
         function showNFT() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'flex';
-            document.getElementById('tasksScreen').style.display = 'none';
         }
 
-        function showTasks() {
-            document.getElementById('clickerScreen').style.display = 'none';
-            document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('tasksScreen').style.display = 'flex';
-            updateDailyReward();
-            checkTaskCompletion();
-        }
+        function buyOrSellNFT(nftIndex) {
+            const nftPrice = nftPrices[nftIndex - 1];
+            const hasNFT = nftOwned[nftIndex - 1];
+            const priceChangeElem = document.getElementById(`nftChange${nftIndex}`);
+            const buyButtonElem = document.getElementById(`buyButton${nftIndex}`);
 
-        function buyOrSellNFT() {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.style.display = 'none';
-
-            if (!hasNFT) {
-                if (count >= nftPrice) {
-                    count -= nftPrice;
-                    hasNFT = true;
-                    document.getElementById('buyButton').innerText = 'SELL';
-                    localStorage.setItem('hasNFT', 'true');
-                    updateCounterDisplay();
-                    localStorage.setItem('counter', count);
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            } else {
+            if (!hasNFT && count >= nftPrice) {
+                count -= nftPrice;
+                nftOwned[nftIndex - 1] = true;
+                buyButtonElem.innerText = 'SELL';
+                priceChangeElem.innerText = '';
+                localStorage.setItem(`hasNFT${nftIndex}`, 'true');
+            } else if (hasNFT) {
                 count += nftPrice;
-                hasNFT = false;
-                document.getElementById('buyButton').innerText = 'BUY';
-                localStorage.removeItem('hasNFT');
-                updateCounterDisplay();
-                localStorage.setItem('counter', count);
+                nftOwned[nftIndex - 1] = false;
+                buyButtonElem.innerText = 'BUY';
+                localStorage.removeItem(`hasNFT${nftIndex}`);
+            }
+            updateCounterDisplay();
+            localStorage.setItem('counter', count);
+            updateNFTPriceChange(nftIndex);
+        }
+
+        function updateNFTPriceChange(nftIndex) {
+            const priceChangeElem = document.getElementById(`nftChange${nftIndex}`);
+            const basePrice = nftBasePrices[nftIndex - 1];
+            const currentPrice = nftPrices[nftIndex - 1];
+            const percentageChange = ((currentPrice - basePrice) / basePrice * 100).toFixed(2);
+            const isOwned = nftOwned[nftIndex - 1];
+
+            if (isOwned) {
+                priceChangeElem.innerText = `${percentageChange}%`;
+                priceChangeElem.style.color = percentageChange >= 0 ? 'green' : 'red';
+            } else {
+                priceChangeElem.innerText = '';
             }
         }
 
-        setInterval(changeNFTPrice, 1000);
+        setInterval(() => {
+            nftPrices = nftPrices.map(price => Math.floor(price * (0.95 + Math.random() * 0.1)));
+            nftPrices.forEach((_, index) => updateNFTPriceChange(index + 1));
+        }, 1000);
 
         window.Telegram.WebApp.ready();
-
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         if (user) {
             document.getElementById('nickname').innerText = user.first_name || user.username;
         }
 
         updateCounterDisplay();
-
-        function updateDailyReward() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (lastLogin && today - lastLogin === 86400000) {
-                dailyStreak = Math.min(dailyStreak + 1, 10);
-            } else if (!lastLogin || today - lastLogin > 86400000) {
-                dailyStreak = 1;
-            }
-
-            localStorage.setItem('dailyStreak', dailyStreak);
-            localStorage.setItem('lastLogin', today);
-
-            const reward = dailyStreak * 100;
-            document.getElementById('dailyRewardAmount').innerText = reward;
-
-            document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
-        }
-
-        function claimDailyReward() {
-            const reward = dailyStreak * 100;
-            count += reward;
-            updateCounterDisplay();
-            localStorage.setItem('counter', count);
-
-            document.getElementById('claimDailyButton').disabled = true;
-            localStorage.setItem('dailyRewardClaimed', 'true');
-            displayMessage(`You have claimed ${reward} coins as a daily reward!`);
-        }
-
-        async function claimChannelReward() {
-            try {
-                const isSubscribed = await checkUserSubscription();
-
-                if (isSubscribed && !localStorage.getItem('channelRewardClaimed')) {
-                    count += 1000;
-                    updateCounterDisplay();
-                    localStorage.setItem('counter', count);
-                    localStorage.setItem('channelRewardClaimed', 'true');
-                    displayMessage('You have received 1000 coins for subscribing!');
-                } else if (localStorage.getItem('channelRewardClaimed')) {
-                    displayMessage('You have already claimed this reward.');
-                } else {
-                    displayMessage('Please subscribe to the channel to claim the reward.');
-                }
-            } catch (error) {
-                displayMessage('Error checking subscription. Please try again later.');
-            }
-        }
-
-        async function checkUserSubscription() {
-            return new Promise((resolve) => {
-                setTimeout(() => resolve(true), 1000);
-            });
-        }
-
-        function checkTaskCompletion() {
-            document.getElementById('claimDailyButton').disabled = localStorage.getItem('dailyRewardClaimed') === 'true';
-            document.getElementById('claimChannelButton').disabled = localStorage.getItem('channelRewardClaimed') === 'true';
-        }
-
-        function displayMessage(message) {
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerText = message;
-            messageContainer.style.display = 'block';
-
-            setTimeout(() => {
-                messageContainer.style.display = 'none';
-            }, 3000);
-        }
     </script>
 </body>
 </html>
+
