@@ -22,7 +22,7 @@
             text-align: center;
             color: #FFD700;
             position: absolute;
-            top: 10px;
+            top: 60px; /* Знижено лінію */
             left: 50%;
             transform: translateX(-50%);
         }
@@ -31,7 +31,7 @@
             height: 4px;
             background-color: #0000FF;
             position: absolute;
-            top: 50px; /* Змініть для опускання лінії */
+            top: 100px; /* Знижено для чіткішого відображення */
             left: 0;
         }
         .counter {
@@ -59,11 +59,6 @@
         .burger-button:active {
             transform: scale(1.1);
         }
-        .burger-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
         .nft-container {
             display: none;
             flex-direction: column;
@@ -118,10 +113,6 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .buy-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
         .menu {
             position: fixed;
             bottom: 50px;
@@ -140,13 +131,10 @@
             cursor: pointer;
             outline: none;
         }
-        .menu button:focus {
-            outline: none;
-        }
     </style>
 </head>
 <body>
-    <div class="nickname" id="nickname">My nick</div>
+    <div class="nickname" id="nickname"></div>
     <div class="blue-line"></div>
 
     <!-- Clicker Screen -->
@@ -168,7 +156,7 @@
         <div class="nft-box">
             <div class="nft-image"></div>
             <div class="nft-info">
-                <div class="nft-price" id="nftPrice2">10000</div>
+                <div class="nft-price" id="nftPrice2">2000</div>
                 <button class="buy-button" onclick="buyOrSellNFT(2)" id="buyButton2">BUY</button>
                 <div class="price-change" id="priceChange2"></div>
             </div>
@@ -183,10 +171,13 @@
 
     <script>
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let nftPrices = [1000, 10000];
+        let nftPrices = [1000, 2000];
         let purchasePrices = [null, null];
         let hasNFT = [false, false];
-        
+        let nickname = localStorage.getItem('nickname') || "User";
+
+        document.getElementById('nickname').innerText = nickname;
+
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
         }
@@ -205,6 +196,10 @@
         function showNFT() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'flex';
+
+            // Очищення повідомлень про зміни ціни при перемиканні вкладок
+            document.getElementById('priceChange1').innerText = '';
+            document.getElementById('priceChange2').innerText = '';
         }
 
         function buyOrSellNFT(nftIndex) {
@@ -240,7 +235,7 @@
         function changeNFTPrices() {
             nftPrices = nftPrices.map(price => {
                 let randomChange = (Math.random() * 2 - 1) * 10;
-                return Math.max(500, price + randomChange); // Мінімальна ціна - 500
+                return Math.max(500, price + randomChange);
             });
 
             document.getElementById('nftPrice1').innerText = Math.round(nftPrices[0]);
