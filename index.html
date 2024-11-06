@@ -26,6 +26,14 @@
             left: 50%;
             transform: translateX(-50%);
         }
+        .blue-line {
+            width: 100%;
+            height: 4px;
+            background-color: #0000FF;
+            position: absolute;
+            top: 40px;
+            left: 0;
+        }
         .counter {
             font-size: 60px;
             font-weight: bold;
@@ -59,15 +67,24 @@
         /* NFT Screen Styles */
         .nft-container {
             display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            padding-top: 50px;
+        }
+        .nft-box {
+            display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100vh;
-            background-image: url('your-background-image-url.png'); /* Replace with your background image URL */
-            background-size: cover;
-            background-position: center;
-            color: white;
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 10px;
         }
         .nft-image {
             width: 200px;
@@ -170,6 +187,7 @@
 </head>
 <body>
     <div class="nickname" id="nickname">My nick</div>
+    <div class="blue-line"></div>
 
     <!-- Clicker Screen -->
     <div id="clickerScreen">
@@ -179,12 +197,14 @@
 
     <!-- NFT Screen -->
     <div id="nftScreen" class="nft-container">
-        <div class="nft-image"></div>
-        <div class="nft-info">
-            <div class="nft-price" id="nftPrice">1000</div>
-            <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
-            <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
+        <div class="nft-box">
+            <div class="nft-image"></div>
+            <div class="nft-info">
+                <div class="nft-price" id="nftPrice">1000</div>
+                <button class="buy-button" onclick="buyOrSellNFT()" id="buyButton">BUY</button>
+            </div>
         </div>
+        <div class="error-message" id="errorMessage">YOU DON'T HAVE ENOUGH COINS</div>
     </div>
 
     <!-- Tasks Screen -->
@@ -256,6 +276,7 @@
                     count -= nftPrice;
                     hasNFT = true;
                     document.getElementById('buyButton').innerText = 'SELL';
+                    localStorage.setItem('hasNFT', 'true');
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
                 } else {
@@ -265,15 +286,10 @@
                 count += nftPrice;
                 hasNFT = false;
                 document.getElementById('buyButton').innerText = 'BUY';
+                localStorage.removeItem('hasNFT');
                 updateCounterDisplay();
                 localStorage.setItem('counter', count);
             }
-        }
-
-        function changeNFTPrice() {
-            nftPrice += Math.floor(Math.random() * 21) - 10;
-            nftPrice = Math.max(nftPrice, 1);
-            document.getElementById('nftPrice').innerText = nftPrice;
         }
 
         setInterval(changeNFTPrice, 1000);
