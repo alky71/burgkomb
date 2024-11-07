@@ -127,6 +127,27 @@
         .negative-change {
             color: red;
         }
+        .menu {
+            position: fixed;
+            bottom: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+        }
+        .menu button {
+            flex: 1;
+            background-color: #444;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 15px 0;
+            cursor: pointer;
+            outline: none;
+        }
+        .menu button:focus {
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +181,12 @@
                 <div class="price-change" id="priceChange2"></div>
             </div>
         </div>
+    </div>
+
+    <!-- Bottom Menu -->
+    <div class="menu">
+        <button onclick="showClicker()">Clicker</button>
+        <button onclick="showNFT()">NFT</button>
     </div>
 
     <script>
@@ -224,6 +251,16 @@
                 updateClickProgress();
             }
             localStorage.setItem('counter', count);
+        }
+
+        function showClicker() {
+            document.getElementById('clickerScreen').style.display = 'flex';
+            document.getElementById('nftScreen').style.display = 'none';
+        }
+
+        function showNFT() {
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'flex';
         }
 
         setNickname();
