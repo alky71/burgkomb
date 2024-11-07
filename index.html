@@ -26,14 +26,6 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        .blue-line {
-            width: 100%;
-            height: 4px;
-            background-color: #0000FF;
-            position: absolute;
-            top: 40px; /* Змініть для опускання лінії */
-            left: 0;
-        }
         .counter {
             font-size: 60px;
             font-weight: bold;
@@ -143,11 +135,16 @@
         .menu button:focus {
             outline: none;
         }
+        .positive-change {
+            color: green;
+        }
+        .negative-change {
+            color: red;
+        }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname"></div>
-    <div class="blue-line"></div>
 
     <!-- Clicker Screen -->
     <div id="clickerScreen">
@@ -188,7 +185,7 @@
         let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
 
         function setNickname() {
-            document.getElementById('nickname').innerText = "Your Nickname"; // Замініть на реальне ім'я
+            document.getElementById('nickname').innerText = "User Name"; // замініть на реальне ім'я користувача
         }
 
         function updateCounterDisplay() {
@@ -211,9 +208,21 @@
             document.getElementById('nftScreen').style.display = 'flex';
         }
 
+        function updateNFTPrices() {
+            for (let i = 0; i < nftPrices.length; i++) {
+                nftPrices[i] = Math.round(nftPrices[i] * (Math.random() * (1.2 - 0.8) + 0.8));
+                document.getElementById(`nftPrice${i + 1}`).innerText = nftPrices[i];
+                if (hasNFT[i] && purchasePrices[i] !== null) {
+                    let priceDifference = ((nftPrices[i] - purchasePrices[i]) / purchasePrices[i]) * 100;
+                    const priceChangeElement = document.getElementById(`priceChange${i + 1}`);
+                    priceChangeElement.innerText = `${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}%`;
+                    priceChangeElement.className = priceDifference >= 0 ? 'price-change positive-change' : 'price-change negative-change';
+                }
+            }
+        }
+
         function buyOrSellNFT(nftIndex) {
             const buyButton = document.getElementById(`buyButton${nftIndex}`);
-            const priceChangeDisplay = document.getElementById(`priceChange${nftIndex}`);
 
             if (!hasNFT[nftIndex - 1]) {
                 if (count >= nftPrices[nftIndex - 1]) {
@@ -221,7 +230,7 @@
                     purchasePrices[nftIndex - 1] = nftPrices[nftIndex - 1];
                     hasNFT[nftIndex - 1] = true;
                     buyButton.innerText = 'SELL';
-                    priceChangeDisplay.innerText = '';
+                    document.getElementById(`priceChange${nftIndex}`).innerText = '';
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
                     localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
@@ -231,8 +240,6 @@
                 }
             } else {
                 count += nftPrices[nftIndex - 1];
-                let priceDifference = ((nftPrices[nftIndex - 1] - purchasePrices[nftIndex - 1]) / purchasePrices[nftIndex - 1]) * 100;
-                priceChangeDisplay.innerText = `${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}%`;
                 hasNFT[nftIndex - 1] = false;
                 buyButton.innerText = 'BUY';
                 updateCounterDisplay();
@@ -240,12 +247,11 @@
                 localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
                 localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
             }
-            nftPrices[nftIndex - 1] = Math.round(nftPrices[nftIndex - 1] * (Math.random() * (1.2 - 0.8) + 0.8));
-            document.getElementById(`nftPrice${nftIndex}`).innerText = nftPrices[nftIndex - 1];
         }
 
         setNickname();
         updateCounterDisplay();
+        setInterval(updateNFTPrices, 1000); // Оновлюємо ціни щосекунди
     </script>
 </body>
 </html>
