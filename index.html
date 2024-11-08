@@ -34,7 +34,7 @@
             margin-top: 20px;
         }
         .click-progress {
-            width: 90%;
+            width: 250px; /* Розмір як монета */
             height: 25px;
             background-color: #333;
             border-radius: 10px;
@@ -51,6 +51,7 @@
             font-size: 18px;
             color: #FFD700;
             margin-top: 5px;
+            text-align: center;
         }
         .burger-button {
             width: 250px;
@@ -116,6 +117,7 @@
         .price-change {
             font-size: 20px;
             margin-top: 5px;
+            text-align: center;
         }
         .buy-button {
             background-color: #ccff00;
@@ -209,7 +211,7 @@
         let clicksLeft = clickLimit;
 
         function setNickname() {
-            document.getElementById('nickname').innerText = "User Name"; // замініть на реальне ім'я користувача
+            document.getElementById('nickname').innerText = "User Name";
         }
 
         function updateCounterDisplay() {
@@ -255,10 +257,9 @@
             nftPrices.forEach((price, index) => {
                 document.getElementById(`nftPrice${index + 1}`).innerText = price;
                 if (hasNFT[index] && purchasePrices[index] !== null) {
-                    let priceDifference = ((price - purchasePrices[index]) / purchasePrices[index]) * 100;
-                    const priceChangeElement = document.getElementById(`priceChange${index + 1}`);
-                    priceChangeElement.innerText = `${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}%`;
-                    priceChangeElement.className = priceDifference >= 0 ? 'price-change positive-change' : 'price-change negative-change';
+                    let priceChange = ((price - purchasePrices[index]) / purchasePrices[index] * 100).toFixed(2);
+                    document.getElementById(`priceChange${index + 1}`).innerText = (priceChange >= 0 ? '+' : '') + priceChange + '%';
+                    document.getElementById(`priceChange${index + 1}`).className = priceChange >= 0 ? 'price-change positive-change' : 'price-change negative-change';
                 }
             });
             localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
@@ -266,6 +267,7 @@
 
         function buyOrSellNFT(priceIndex) {
             const buyButton = document.getElementById(`buyButton${priceIndex}`);
+            const priceChangeDisplay = document.getElementById(`priceChange${priceIndex}`);
             if (!hasNFT[priceIndex]) {
                 if (count >= nftPrices[priceIndex]) {
                     count -= nftPrices[priceIndex];
@@ -273,18 +275,18 @@
                     hasNFT[priceIndex] = true;
                     buyButton.innerText = 'SELL';
                     updateCounterDisplay();
+                    priceChangeDisplay.innerText = "0.00%";
+                    priceChangeDisplay.className = 'price-change negative-change';
                     localStorage.setItem('counter', count);
                     localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
                     localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
-                } else {
-                    alert("You don't have enough coins!");
                 }
             } else {
                 const profit = nftPrices[priceIndex] - purchasePrices[priceIndex];
                 count += nftPrices[priceIndex];
                 hasNFT[priceIndex] = false;
                 buyButton.innerText = 'BUY';
-                alert(`Profit: ${profit >= 0 ? '+' : ''}${profit}`);
+                priceChangeDisplay.innerText = `Profit: ${(profit >= 0 ? '+' : '')}${profit}`;
                 updateCounterDisplay();
                 localStorage.setItem('counter', count);
                 localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
@@ -295,7 +297,7 @@
         setNickname();
         updateCounterDisplay();
         updateClickProgress();
-        setInterval(updateNFTPrices, 5000); // Оновлюємо ціни кожні 5 секунд
+        setInterval(updateNFTPrices, 1000); // Оновлюємо ціни кожну секунду
     </script>
 </body>
 </html>
