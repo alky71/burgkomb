@@ -5,20 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* стиль той самий */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .nickname {
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #FFD700;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .counter {
+            font-size: 60px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+        }
+        .click-progress {
+            width: 80%;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .click-progress-bar {
+            height: 100%;
+            background-color: #00bfff;
+            border-radius: 10px;
+            transition: width 0.1s ease;
+        }
+        .click-count {
+            font-size: 18px;
+            color: #FFD700;
+            margin-top: 5px;
+        }
+        .burger-button {
+            width: 250px;
+            height: 250px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease;
+        }
+        .burger-button:active {
+            transform: scale(1.1);
+        }
+        .burger-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .nft-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            padding-top: 50px;
+        }
+        .nft-box {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .nft-image {
+            width: 200px;
+            height: 200px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        .nft-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nft-price {
+            font-size: 30px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        .price-change {
+            font-size: 20px;
+            margin-top: 5px;
+        }
+        .buy-button {
+            background-color: #ccff00;
+            color: black;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .buy-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .menu {
+            position: fixed;
+            bottom: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+        }
+        .menu button {
+            flex: 1;
+            background-color: #444;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 15px 0;
+            cursor: pointer;
+            outline: none;
+        }
+        .menu button:focus {
+            outline: none;
+        }
+        .positive-change {
+            color: green;
+        }
+        .negative-change {
+            color: red;
+        }
     </style>
 </head>
 <body>
-    <div class="nickname" id="nickname"></div>
+    <div class="nickname" id="nickname">User Name</div>
 
     <!-- Clicker Screen -->
     <div id="clickerScreen">
         <div class="counter" id="counter">0</div>
-        <button class="burger-button" onclick="incrementCounter()"></button>
-        <div class="clicks-remaining">
-            <div class="progress-bar" id="progressBar"></div>
-            <div id="clicksRemaining">1000</div>
+        <div class="click-progress">
+            <div class="click-progress-bar" id="clickProgressBar"></div>
         </div>
+        <div class="click-count" id="clickCountDisplay">1000</div>
+        <button class="burger-button" onclick="incrementCounter()"></button>
     </div>
 
     <!-- NFT Screen -->
@@ -49,10 +202,11 @@
 
     <script>
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let nftPrices = [1000, 10000];
+        let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
         let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
         let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
-        let clicksRemaining = 1000;
+        let clickLimit = 1000;
+        let clicksLeft = clickLimit;
 
         function setNickname() {
             document.getElementById('nickname').innerText = "User Name"; // замініть на реальне ім'я користувача
@@ -63,20 +217,27 @@
         }
 
         function incrementCounter() {
-            if (clicksRemaining > 0) {
+            if (clicksLeft > 0) {
                 count += 1;
-                clicksRemaining -= 1;
+                clicksLeft -= 1;
                 updateCounterDisplay();
-                updateProgressBar();
+                updateClickProgress();
                 localStorage.setItem('counter', count);
+                localStorage.setItem('clicksLeft', clicksLeft);
             }
         }
 
-        function updateProgressBar() {
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = (clicksRemaining / 1000) * 100 + '%';
-            document.getElementById('clicksRemaining').innerText = clicksRemaining;
+        function updateClickProgress() {
+            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
+            document.getElementById('clickCountDisplay').innerText = clicksLeft;
         }
+
+        setInterval(() => {
+            if (clicksLeft < clickLimit) {
+                clicksLeft += 1;
+                updateClickProgress();
+            }
+        }, 1000);
 
         function showClicker() {
             document.getElementById('clickerScreen').style.display = 'flex';
@@ -89,29 +250,24 @@
         }
 
         function updateNFTPrices() {
-            const newPriceFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-            nftPrices = nftPrices.map(price => Math.round(price * newPriceFactor));
-            nftPrices.forEach((price, i) => {
-                document.getElementById(`nftPrice${i + 1}`).innerText = price;
-                if (hasNFT[i] && purchasePrices[i] !== null) {
-                    let priceDifference = ((price - purchasePrices[i]) / purchasePrices[i]) * 100;
-                    const priceChangeElement = document.getElementById(`priceChange${i + 1}`);
-                    priceChangeElement.innerText = `${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}%`;
-                    priceChangeElement.className = priceDifference >= 0 ? 'price-change positive-change' : 'price-change negative-change';
-                }
+            let randomFactor = Math.random() * (1.1 - 0.9) + 0.9; // Менша зміна
+            nftPrices = nftPrices.map(price => Math.round(price * randomFactor));
+            nftPrices.forEach((price, index) => {
+                document.getElementById(`nftPrice${index + 1}`).innerText = price;
             });
+            localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
         }
 
         function buyOrSellNFT(nftIndex) {
             const buyButton = document.getElementById(`buyButton${nftIndex}`);
+            const priceIndex = nftIndex - 1;
 
-            if (!hasNFT[nftIndex - 1]) {
-                if (count >= nftPrices[nftIndex - 1]) {
-                    count -= nftPrices[nftIndex - 1];
-                    purchasePrices[nftIndex - 1] = nftPrices[nftIndex - 1];
-                    hasNFT[nftIndex - 1] = true;
+            if (!hasNFT[priceIndex]) {
+                if (count >= nftPrices[priceIndex]) {
+                    count -= nftPrices[priceIndex];
+                    purchasePrices[priceIndex] = nftPrices[priceIndex];
+                    hasNFT[priceIndex] = true;
                     buyButton.innerText = 'SELL';
-                    document.getElementById(`priceChange${nftIndex}`).innerText = '';
                     updateCounterDisplay();
                     localStorage.setItem('counter', count);
                     localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
@@ -120,8 +276,8 @@
                     alert("You don't have enough coins!");
                 }
             } else {
-                count += nftPrices[nftIndex - 1];
-                hasNFT[nftIndex - 1] = false;
+                count += nftPrices[priceIndex];
+                hasNFT[priceIndex] = false;
                 buyButton.innerText = 'BUY';
                 updateCounterDisplay();
                 localStorage.setItem('counter', count);
@@ -132,12 +288,8 @@
 
         setNickname();
         updateCounterDisplay();
-        updateProgressBar();
-        setInterval(() => {
-            clicksRemaining = Math.min(1000, clicksRemaining + 1);
-            updateProgressBar();
-            updateNFTPrices();
-        }, 1000); // Оновлюємо кожну секунду
+        updateClickProgress();
+        setInterval(updateNFTPrices, 5000); // Оновлюємо ціни кожні 5 секунд
     </script>
 </body>
 </html>
