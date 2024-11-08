@@ -34,8 +34,8 @@
             margin-top: 20px;
         }
         .click-progress {
-            width: 80%;
-            height: 20px;
+            width: 90%;
+            height: 25px;
             background-color: #333;
             border-radius: 10px;
             margin-top: 10px;
@@ -167,11 +167,11 @@
     <!-- Clicker Screen -->
     <div id="clickerScreen">
         <div class="counter" id="counter">0</div>
+        <button class="burger-button" onclick="incrementCounter()"></button>
         <div class="click-progress">
             <div class="click-progress-bar" id="clickProgressBar"></div>
         </div>
         <div class="click-count" id="clickCountDisplay">1000</div>
-        <button class="burger-button" onclick="incrementCounter()"></button>
     </div>
 
     <!-- NFT Screen -->
@@ -250,18 +250,22 @@
         }
 
         function updateNFTPrices() {
-            let randomFactor = Math.random() * (1.1 - 0.9) + 0.9; // Менша зміна
+            let randomFactor = Math.random() * (1.1 - 0.9) + 0.9;
             nftPrices = nftPrices.map(price => Math.round(price * randomFactor));
             nftPrices.forEach((price, index) => {
                 document.getElementById(`nftPrice${index + 1}`).innerText = price;
+                if (hasNFT[index] && purchasePrices[index] !== null) {
+                    let priceDifference = ((price - purchasePrices[index]) / purchasePrices[index]) * 100;
+                    const priceChangeElement = document.getElementById(`priceChange${index + 1}`);
+                    priceChangeElement.innerText = `${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}%`;
+                    priceChangeElement.className = priceDifference >= 0 ? 'price-change positive-change' : 'price-change negative-change';
+                }
             });
             localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
         }
 
-        function buyOrSellNFT(nftIndex) {
-            const buyButton = document.getElementById(`buyButton${nftIndex}`);
-            const priceIndex = nftIndex - 1;
-
+        function buyOrSellNFT(priceIndex) {
+            const buyButton = document.getElementById(`buyButton${priceIndex}`);
             if (!hasNFT[priceIndex]) {
                 if (count >= nftPrices[priceIndex]) {
                     count -= nftPrices[priceIndex];
@@ -276,9 +280,11 @@
                     alert("You don't have enough coins!");
                 }
             } else {
+                const profit = nftPrices[priceIndex] - purchasePrices[priceIndex];
                 count += nftPrices[priceIndex];
                 hasNFT[priceIndex] = false;
                 buyButton.innerText = 'BUY';
+                alert(`Profit: ${profit >= 0 ? '+' : ''}${profit}`);
                 updateCounterDisplay();
                 localStorage.setItem('counter', count);
                 localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
