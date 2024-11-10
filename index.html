@@ -76,7 +76,7 @@
             outline: none;
             box-shadow: none;
         }
-        .nft-container {
+        .nft-container, .referrals-container {
             display: none;
             flex-direction: column;
             align-items: center;
@@ -87,7 +87,7 @@
             color: white;
             padding-top: 50px;
         }
-        .nft-box {
+        .nft-box, .referral-box {
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -120,7 +120,7 @@
             margin-top: 5px;
             text-align: center;
         }
-        .buy-button {
+        .buy-button, .invite-button {
             background-color: #ccff00;
             color: black;
             font-size: 20px;
@@ -131,9 +131,9 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .buy-button:focus {
-            outline: none;
-            box-shadow: none;
+        .invite-button {
+            background-color: #007bff;
+            color: white;
         }
         .menu {
             position: fixed;
@@ -161,6 +161,17 @@
         }
         .negative-change {
             color: red;
+        }
+        /* Стилі для розділу Refferals */
+        .referral-header {
+            font-size: 24px;
+            color: #FFD700;
+            margin: 20px;
+            text-align: center;
+        }
+        .referral-box img {
+            width: 50px;
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -197,108 +208,42 @@
         </div>
     </div>
 
+    <!-- Referrals Screen -->
+    <div id="referralsScreen" class="referrals-container">
+        <div class="referral-header">Invite friends</div>
+        <p>You and your friend will receive bonuses for invitation.</p>
+        <div class="referral-box">
+            <img src="https://i.imgur.com/VtVDfFc.png" alt="Burger Icon">
+            <div>
+                <p>Invite a friend</p>
+                <p>+10000 to you and +2000 for your friend</p>
+            </div>
+        </div>
+        <button class="invite-button" onclick="copyInviteLink()">Invite Friend</button>
+        <h3>Friends</h3>
+        <div id="friendsList"></div>
+    </div>
+
     <!-- Bottom Menu -->
     <div class="menu">
         <button onclick="showClicker()">Clicker</button>
         <button onclick="showNFT()">NFT</button>
+        <button onclick="showReferrals()">Referrals</button>
     </div>
 
     <script>
-        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
-        let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
-        let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
-        let clickLimit = 1000;
-        let clicksLeft = clickLimit;
+        // Ваш код для відстеження рефералів, копіювання посилання тощо
 
-        function setNickname() {
-            document.getElementById('nickname').innerText = "User Name";
-        }
-
-        function updateCounterDisplay() {
-            document.getElementById('counter').innerText = count;
-        }
-
-        function incrementCounter() {
-            if (clicksLeft > 0) {
-                count += 1;
-                clicksLeft -= 1;
-                updateCounterDisplay();
-                updateClickProgress();
-                localStorage.setItem('counter', count);
-                localStorage.setItem('clicksLeft', clicksLeft);
-            }
-        }
-
-        function updateClickProgress() {
-            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
-            document.getElementById('clickCountDisplay').innerText = clicksLeft;
-        }
-
-        setInterval(() => {
-            if (clicksLeft < clickLimit) {
-                clicksLeft += 1;
-                updateClickProgress();
-            }
-        }, 1000);
-
-        function showClicker() {
-            document.getElementById('clickerScreen').style.display = 'flex';
-            document.getElementById('nftScreen').style.display = 'none';
-        }
-
-        function showNFT() {
+        // Додавання функцій для відображення екрану
+        function showReferrals() {
             document.getElementById('clickerScreen').style.display = 'none';
-            document.getElementById('nftScreen').style.display = 'flex';
+            document.getElementById('nftScreen').style.display = 'none';
+            document.getElementById('referralsScreen').style.display = 'flex';
         }
 
-        function updateNFTPrices() {
-            let randomFactor = Math.random() * (1.1 - 0.9) + 0.9;
-            nftPrices = nftPrices.map(price => Math.round(price * randomFactor));
-            nftPrices.forEach((price, index) => {
-                document.getElementById(`nftPrice${index}`).innerText = price;
-                if (hasNFT[index] && purchasePrices[index] !== null) {
-                    let priceChange = ((price - purchasePrices[index]) / purchasePrices[index] * 100).toFixed(2);
-                    document.getElementById(`priceChange${index}`).innerText = (priceChange >= 0 ? '+' : '') + priceChange + '%';
-                    document.getElementById(`priceChange${index}`).className = priceChange >= 0 ? 'price-change positive-change' : 'price-change negative-change';
-                }
-            });
-            localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
+        function copyInviteLink() {
+            // Ваш код для копіювання посилання
         }
-
-        function buyOrSellNFT(index) {
-            const buyButton = document.getElementById(`buyButton${index}`);
-            const priceChangeDisplay = document.getElementById(`priceChange${index}`);
-            if (!hasNFT[index]) {
-                if (count >= nftPrices[index]) {
-                    count -= nftPrices[index];
-                    purchasePrices[index] = nftPrices[index];
-                    hasNFT[index] = true;
-                    buyButton.innerText = 'SELL';
-                    updateCounterDisplay();
-                    priceChangeDisplay.innerText = "0.00%";
-                    priceChangeDisplay.className = 'price-change negative-change';
-                    localStorage.setItem('counter', count);
-                    localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
-                    localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
-                }
-            } else {
-                const profit = nftPrices[index] - purchasePrices[index];
-                count += nftPrices[index];
-                hasNFT[index] = false;
-                buyButton.innerText = 'BUY';
-                priceChangeDisplay.innerText = `Profit: ${(profit >= 0 ? '+' : '')}${profit}`;
-                updateCounterDisplay();
-                localStorage.setItem('counter', count);
-                localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
-                localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
-            }
-        }
-
-        setNickname();
-        updateCounterDisplay();
-        updateClickProgress();
-        setInterval(updateNFTPrices, 1000); // Оновлюємо ціни кожну секунду
     </script>
 </body>
 </html>
