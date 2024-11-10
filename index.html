@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* Стилі не змінювалися */
         body {
             display: flex;
             flex-direction: column;
@@ -71,10 +70,6 @@
         }
         .burger-button:active {
             transform: scale(1.1);
-        }
-        .burger-button:focus {
-            outline: none;
-            box-shadow: none;
         }
         .nft-container, .referrals-container {
             display: none;
@@ -153,9 +148,6 @@
             cursor: pointer;
             outline: none;
         }
-        .menu button:focus {
-            outline: none;
-        }
         .positive-change {
             color: green;
         }
@@ -232,17 +224,47 @@
     </div>
 
     <script>
-        // Ваш код для відстеження рефералів, копіювання посилання тощо
+        // Логіка для відображення екранів
+        function showClicker() {
+            document.getElementById('clickerScreen').style.display = 'block';
+            document.getElementById('nftScreen').style.display = 'none';
+            document.getElementById('referralsScreen').style.display = 'none';
+        }
 
-        // Додавання функцій для відображення екрану
+        function showNFT() {
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'flex';
+            document.getElementById('referralsScreen').style.display = 'none';
+        }
+
         function showReferrals() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'none';
             document.getElementById('referralsScreen').style.display = 'flex';
         }
 
+        // Ініціалізація зображення натискань
+        function incrementCounter() {
+            let counter = document.getElementById("counter");
+            let clickProgressBar = document.getElementById("clickProgressBar");
+            let clickCountDisplay = document.getElementById("clickCountDisplay");
+
+            let count = parseInt(counter.textContent);
+            let maxClicks = 1000;
+
+            if (count < maxClicks) {
+                count += 1;
+                counter.textContent = count;
+                clickProgressBar.style.width = (count / maxClicks * 100) + "%";
+                clickCountDisplay.textContent = maxClicks - count;
+            }
+        }
+
+        // Функція для реферального посилання
         function copyInviteLink() {
-            // Ваш код для копіювання посилання
+            navigator.clipboard.writeText("https://example.com/invite").then(() => {
+                alert("Invite link copied!");
+            });
         }
     </script>
 </body>
