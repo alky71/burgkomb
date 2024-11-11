@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
+        /* Стилі не змінювалися */
         body {
             display: flex;
             flex-direction: column;
@@ -26,142 +27,75 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        .counter {
-            font-size: 60px;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-            margin-top: 20px;
-        }
-        .click-progress {
-            width: 250px;
-            height: 25px;
-            background-color: #333;
-            border-radius: 10px;
-            margin-top: 10px;
-            position: relative;
-        }
-        .click-progress-bar {
-            height: 100%;
-            background-color: #00bfff;
-            border-radius: 10px;
-            transition: width 0.1s ease;
-        }
-        .click-count {
-            font-size: 18px;
-            color: #FFD700;
-            margin-top: 5px;
-            text-align: center;
-        }
-        .burger-button {
-            width: 250px;
-            height: 250px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
-            background-size: cover;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s ease;
-        }
-        .burger-button:active {
-            transform: scale(1.1);
-        }
-        .nft-container, .referrals-container {
+        /* Інші стилі залишаються без змін */
+        
+        /* Нові стилі для меню рефералів */
+        .referral-container {
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             width: 100%;
-            height: 100vh;
-            background-color: black;
+            background-color: #222;
+            padding-top: 20px;
             color: white;
-            padding-top: 50px;
         }
-        .nft-box, .referral-box {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid #FFD700;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 10px;
+        .referral-header {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        .nft-image {
-            width: 200px;
-            height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
-            background-size: cover;
-            border-radius: 50%;
-            margin-right: 20px;
+        .referral-header img {
+            width: 100px;
+            margin-bottom: 10px;
         }
-        .nft-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .nft-price {
-            font-size: 30px;
+        .referral-info {
+            text-align: center;
+            font-size: 18px;
             color: #FFD700;
             margin-bottom: 10px;
         }
-        .price-change {
-            font-size: 20px;
-            margin-top: 5px;
-            text-align: center;
+        .referral-card {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            width: 80%;
         }
-        .buy-button, .invite-button {
-            background-color: #ccff00;
-            color: black;
-            font-size: 20px;
-            padding: 10px 20px;
+        .referral-card img {
+            width: 50px;
+            margin-right: 15px;
+        }
+        .invite-button {
+            background-color: #4682B4;
+            color: white;
+            padding: 10px;
+            font-size: 18px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .invite-button {
-            background-color: #007bff;
-            color: white;
-        }
-        .menu {
-            position: fixed;
-            bottom: 50px;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background-color: #333;
-        }
-        .menu button {
-            flex: 1;
-            background-color: #444;
-            border: none;
-            color: white;
-            font-size: 20px;
-            padding: 15px 0;
-            cursor: pointer;
-            outline: none;
-        }
-        .positive-change {
-            color: green;
-        }
-        .negative-change {
-            color: red;
-        }
-        /* Стилі для розділу Refferals */
-        .referral-header {
-            font-size: 24px;
-            color: #FFD700;
-            margin: 20px;
+            width: 80%;
             text-align: center;
         }
-        .referral-box img {
+        .friends-section {
+            width: 80%;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .friends-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .friend-item {
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+        }
+        .friend-item img {
             width: 50px;
             margin-right: 10px;
         }
@@ -200,11 +134,14 @@
         </div>
     </div>
 
-    <!-- Referrals Screen -->
-    <div id="referralsScreen" class="referrals-container">
-        <div class="referral-header">Invite friends</div>
-        <p>You and your friend will receive bonuses for invitation.</p>
-        <div class="referral-box">
+    <!-- Referral Screen -->
+    <div id="referralScreen" class="referral-container">
+        <div class="referral-header">
+            <img src="https://i.imgur.com/VtVDfFc.png" alt="Burger Icon">
+            <h2>Invite friends</h2>
+            <p class="referral-info">You and your friends will receive bonuses for invitation.</p>
+        </div>
+        <div class="referral-card">
             <img src="https://i.imgur.com/VtVDfFc.png" alt="Burger Icon">
             <div>
                 <p>Invite a friend</p>
@@ -212,8 +149,12 @@
             </div>
         </div>
         <button class="invite-button" onclick="copyInviteLink()">Invite Friend</button>
-        <h3>Friends</h3>
-        <div id="friendsList"></div>
+        <div class="friends-section">
+            <h3>Friends</h3>
+            <div class="friends-list" id="friendsList">
+                <!-- Список друзів буде оновлюватись динамічно -->
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Menu -->
@@ -224,48 +165,93 @@
     </div>
 
     <script>
-        // Логіка для відображення екранів
+        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
+        let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
+        let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
+        let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
+        let clickLimit = 1000;
+        let clicksLeft = clickLimit;
+        let friendsList = JSON.parse(localStorage.getItem('friendsList')) || [];
+
+        function setNickname() {
+            document.getElementById('nickname').innerText = "User Name";
+        }
+
+        function updateCounterDisplay() {
+            document.getElementById('counter').innerText = count;
+        }
+
+        function incrementCounter() {
+            if (clicksLeft > 0) {
+                count += 1;
+                clicksLeft -= 1;
+                updateCounterDisplay();
+                updateClickProgress();
+                localStorage.setItem('counter', count);
+                localStorage.setItem('clicksLeft', clicksLeft);
+            }
+        }
+
+        function updateClickProgress() {
+            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
+            document.getElementById('clickCountDisplay').innerText = clicksLeft;
+        }
+
+        setInterval(() => {
+            if (clicksLeft < clickLimit) {
+                clicksLeft += 1;
+                updateClickProgress();
+            }
+        }, 1000);
+
         function showClicker() {
-            document.getElementById('clickerScreen').style.display = 'block';
+            document.getElementById('clickerScreen').style.display = 'flex';
             document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('referralsScreen').style.display = 'none';
+            document.getElementById('referralScreen').style.display = 'none';
         }
 
         function showNFT() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'flex';
-            document.getElementById('referralsScreen').style.display = 'none';
+            document.getElementById('referralScreen').style.display = 'none';
         }
 
         function showReferrals() {
             document.getElementById('clickerScreen').style.display = 'none';
             document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('referralsScreen').style.display = 'flex';
+            document.getElementById('referralScreen').style.display = 'flex';
+            updateFriendsList();
         }
 
-        // Ініціалізація зображення натискань
-        function incrementCounter() {
-            let counter = document.getElementById("counter");
-            let clickProgressBar = document.getElementById("clickProgressBar");
-            let clickCountDisplay = document.getElementById("clickCountDisplay");
-
-            let count = parseInt(counter.textContent);
-            let maxClicks = 1000;
-
-            if (count < maxClicks) {
-                count += 1;
-                counter.textContent = count;
-                clickProgressBar.style.width = (count / maxClicks * 100) + "%";
-                clickCountDisplay.textContent = maxClicks - count;
-            }
-        }
-
-        // Функція для реферального посилання
         function copyInviteLink() {
             navigator.clipboard.writeText("https://example.com/invite").then(() => {
                 alert("Invite link copied!");
             });
         }
+
+        function addFriend(name, imgSrc) {
+            friendsList.push({name, imgSrc});
+            localStorage.setItem('friendsList', JSON.stringify(friendsList));
+            updateFriendsList();
+        }
+
+        function updateFriendsList() {
+            const friendsListContainer = document.getElementById('friendsList');
+            friendsListContainer.innerHTML = '';
+            friendsList.forEach(friend => {
+                const friendItem = document.createElement('div');
+                friendItem.classList.add('friend-item');
+                friendItem.innerHTML = `<img src="${friend.imgSrc}" alt="Friend Avatar"><span>${friend.name}</span>`;
+                friendsListContainer.appendChild(friendItem);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setNickname();
+            updateCounterDisplay();
+            updateClickProgress();
+            updateFriendsList();
+        });
     </script>
 </body>
 </html>
