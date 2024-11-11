@@ -34,7 +34,7 @@
             margin-bottom: 20px;
         }
         .burger-button {
-            background: url('https://imgur.com/a/jTbqeRF.png') no-repeat center center;
+            background: url('https://i.imgur.com/a/jTbqeRF.png') no-repeat center center;
             background-size: cover;
             width: 100px;
             height: 100px;
@@ -261,6 +261,7 @@
     <script>
         let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
         let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
+        let priceChange = JSON.parse(localStorage.getItem('priceChange')) || [0, 0];
         let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
         let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
         let clickLimit = 1000;
@@ -282,6 +283,7 @@
             document.getElementById("clickerScreen").style.display = "none";
             document.getElementById("nftScreen").style.display = "flex";
             document.getElementById("referralScreen").style.display = "none";
+            updateNFTPrices();
         }
 
         function showReferrals() {
@@ -326,15 +328,26 @@
                 purchasePrices[id] = price;
                 document.getElementById(`buyButton${id}`).textContent = "SELL";
             } else if (hasNFT[id]) {
-                count += price;
+                count += purchasePrices[id];
                 hasNFT[id] = false;
-                purchasePrices[id] = null;
                 document.getElementById(`buyButton${id}`).textContent = "BUY";
             }
             updateCounterDisplay();
             localStorage.setItem('counter', count);
             localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
             localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
+        }
+
+        function updateNFTPrices() {
+            nftPrices.forEach((price, index) => {
+                const change = Math.floor(Math.random() * 200 - 100); // випадкове коливання ціни
+                nftPrices[index] += change;
+                priceChange[index] = change;
+                document.getElementById(`nftPrice${index}`).textContent = nftPrices[index];
+                document.getElementById(`priceChange${index}`).textContent = change >= 0 ? `+${change}` : change;
+            });
+            localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
+            localStorage.setItem('priceChange', JSON.stringify(priceChange));
         }
 
         function updateFriendsList() {
