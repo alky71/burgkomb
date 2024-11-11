@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* Основні стилі */
         body {
             display: flex;
             flex-direction: column;
@@ -19,111 +18,155 @@
         }
         .nickname {
             font-size: 20px;
-            margin-top: 20px;
-            text-align: center;
             color: #FFD700;
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
         }
-        .counter, .click-count {
-            font-size: 18px;
-            text-align: center;
-            color: #FFD700;
-            margin-top: 10px;
+        .referral-container, .clicker-container, .nft-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
         }
-        .burger-button, .invite-button, .verify-button {
-            width: 250px;
-            height: 250px;
+        .active {
+            display: flex !important;
+        }
+        .counter {
+            font-size: 60px;
+            margin-top: 20px;
+        }
+        .burger-button {
+            width: 200px;
+            height: 200px;
             background-image: url('https://i.imgur.com/VtVDfFc.png');
             background-size: cover;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            outline: none;
-            transition: transform 0.1s ease;
         }
-        .burger-button:active { transform: scale(1.1); }
-        .invite-section { display: flex; flex-direction: column; align-items: center; }
-        .click-progress { width: 250px; height: 25px; background-color: #333; border-radius: 10px; margin-top: 10px; }
-        .click-progress-bar { height: 100%; background-color: #00bfff; border-radius: 10px; transition: width 0.1s ease; }
-        .referral-container { padding: 20px; background-color: #333; border-radius: 10px; width: 80%; text-align: center; }
-        .nft-container { display: none; flex-direction: column; align-items: center; padding-top: 50px; }
-        .nft-box { border: 3px solid #FFD700; padding: 20px; margin-top: 10px; display: flex; align-items: center; }
-        .nft-image { width: 200px; height: 200px; background-image: url('https://i.imgur.com/VtVDfFc.png'); background-size: cover; border-radius: 50%; margin-right: 20px; }
-        .nft-price { font-size: 30px; color: #FFD700; margin-bottom: 10px; }
-        .menu { position: fixed; bottom: 50px; width: 100%; display: flex; justify-content: space-around; background-color: #333; }
-        .menu button { flex: 1; background-color: #444; color: white; padding: 15px 0; }
+        .invite-button, .verify-button, .buy-button, .menu button {
+            background-color: #00bfff;
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .menu {
+            position: fixed;
+            bottom: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+        }
+        .click-progress {
+            width: 250px;
+            height: 25px;
+            background-color: #333;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .click-progress-bar {
+            height: 100%;
+            background-color: #00bfff;
+            border-radius: 10px;
+        }
+        .nft-box {
+            display: flex;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+            width: 80%;
+        }
+        .nft-image {
+            width: 100px;
+            height: 100px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            margin-right: 10px;
+        }
+        .price-change {
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname">User Name</div>
 
     <!-- Clicker Screen -->
-    <div id="clickerScreen">
+    <div class="clicker-container active" id="clickerScreen">
         <div class="counter" id="counter">0</div>
         <button class="burger-button" onclick="incrementCounter()"></button>
         <div class="click-progress">
             <div class="click-progress-bar" id="clickProgressBar"></div>
         </div>
-        <div class="click-count" id="clickCountDisplay">1000</div>
+        <div id="clickCountDisplay">1000</div>
     </div>
 
     <!-- NFT Screen -->
-    <div id="nftScreen" class="nft-container">
-        <div class="nft-box" data-id="0">
+    <div class="nft-container" id="nftScreen">
+        <div class="nft-box">
             <div class="nft-image"></div>
             <div class="nft-info">
-                <div class="nft-price" id="nftPrice0">1000</div>
-                <button class="buy-button" onclick="buyOrSellNFT(0)" id="buyButton0">BUY</button>
+                <div id="nftPrice0">1000</div>
+                <button class="buy-button" onclick="buyOrSellNFT(0)">BUY</button>
                 <div class="price-change" id="priceChange0"></div>
-            </div>
-        </div>
-        <div class="nft-box" data-id="1">
-            <div class="nft-image"></div>
-            <div class="nft-info">
-                <div class="nft-price" id="nftPrice1">10000</div>
-                <button class="buy-button" onclick="buyOrSellNFT(1)" id="buyButton1">BUY</button>
-                <div class="price-change" id="priceChange1"></div>
             </div>
         </div>
     </div>
 
     <!-- Referral Screen -->
-    <div id="referralScreen" class="referral-container">
+    <div class="referral-container" id="referralScreen">
         <h2>Invite Friends</h2>
-        <p>You and your friends will receive bonuses for invitation.</p>
-        <div class="invite-section">
-            <button class="invite-button" onclick="copyInviteLink()">Invite Friend</button>
-            <p>Your referral code is: <span id="userReferralCode">123456</span></p>
-        </div>
-        <div class="referral-input-section" id="referralInputSection">
-            <input type="text" id="referralCodeInput" placeholder="Enter referral code">
-            <button class="verify-button" onclick="verifyReferralCode()">✅</button>
-        </div>
+        <button class="invite-button" onclick="copyInviteLink()">Invite Friend</button>
+        <p>Your referral code: <span id="userReferralCode">123456</span></p>
+        <input type="text" id="referralCodeInput" placeholder="Enter referral code">
+        <button class="verify-button" onclick="verifyReferralCode()">✅</button>
         <div id="referralMessage"></div>
     </div>
 
     <!-- Bottom Menu -->
     <div class="menu">
-        <button onclick="showClicker()">Clicker</button>
-        <button onclick="showNFT()">NFT</button>
-        <button onclick="showReferrals()">Referrals</button>
+        <button onclick="showScreen('clickerScreen')">Clicker</button>
+        <button onclick="showScreen('nftScreen')">NFT</button>
+        <button onclick="showScreen('referralScreen')">Referrals</button>
     </div>
 
     <script>
-        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
-        let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
-        let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
-        let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
-        let clickLimit = 1000;
-        let clicksLeft = clickLimit;
-        let userReferralCode = localStorage.getItem('userReferralCode') || generateReferralCode();
+        let count = parseInt(localStorage.getItem('counter')) || 0;
+        let clicksLeft = 1000;
+        let balance = parseInt(localStorage.getItem('balance')) || 0;
         let referralUsed = localStorage.getItem('referralUsed') || false;
+        let userReferralCode = localStorage.getItem('userReferralCode') || generateReferralCode();
 
-        function setNickname() { document.getElementById('nickname').innerText = "User Name"; }
-        document.getElementById("userReferralCode").innerText = userReferralCode;
+        document.getElementById('userReferralCode').innerText = userReferralCode;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.clicker-container, .nft-container, .referral-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function incrementCounter() {
+            if (clicksLeft > 0) {
+                count++;
+                clicksLeft--;
+                document.getElementById('counter').innerText = count;
+                localStorage.setItem('counter', count);
+                updateClickProgress();
+            }
+        }
+
+        function copyInviteLink() {
+            navigator.clipboard.writeText("https://t.me/Burger_Kombat_bot");
+            alert("Link copied to clipboard!");
+        }
 
         function generateReferralCode() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -131,57 +174,35 @@
             return code;
         }
 
-        function incrementCounter() {
-            if (clicksLeft > 0) {
-                count += 1;
-                clicksLeft -= 1;
-                updateCounterDisplay();
-                updateClickProgress();
-                localStorage.setItem('counter', count);
-            }
-        }
-
-        function updateCounterDisplay() { document.getElementById('counter').innerText = count; }
-        function updateClickProgress() {
-            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
-            document.getElementById('clickCountDisplay').innerText = clicksLeft;
-        }
-        setInterval(() => {
-            if (clicksLeft < clickLimit) { clicksLeft += 1; updateClickProgress(); }
-        }, 1000);
-
-        function showClicker() { displayScreen("clickerScreen"); }
-        function showNFT() { displayScreen("nftScreen"); }
-        function showReferrals() { displayScreen("referralScreen"); }
-
-        function displayScreen(screenId) {
-            document.getElementById("clickerScreen").style.display = "none";
-            document.getElementById("nftScreen").style.display = "none";
-            document.getElementById("referralScreen").style.display = "none";
-            document.getElementById(screenId).style.display = "flex";
-        }
-
-        function copyInviteLink() {
-            navigator.clipboard.writeText("https://t.me/Burger_Kombat_bot").then(() => {
-                alert("Link copied to clipboard!");
-            });
-        }
-
         function verifyReferralCode() {
-            const enteredCode = document.getElementById("referralCodeInput").value;
-            const messageDiv = document.getElementById("referralMessage");
+            const enteredCode = document.getElementById('referralCodeInput').value;
+            const messageDiv = document.getElementById('referralMessage');
+
             if (enteredCode === userReferralCode) {
                 messageDiv.innerText = "You cannot use your own referral code!";
-                messageDiv.className = "error-message";
                 return;
             }
+
             if (enteredCode && !referralUsed) {
-                count += 2000;
-                localStorage.setItem('counter', count);
+                balance += 2000;
+                localStorage.setItem('balance', balance);
                 messageDiv.innerText = "+2000 to you!";
-                messageDiv.className = "success-message";
-                document.getElementById("referralInputSection").style.display = "none";
                 referralUsed = true;
                 localStorage.setItem('referralUsed', true);
-            } else if (referralUsed) {
-                message
+            } else {
+                messageDiv.innerText = "Invalid or already used code!";
+            }
+        }
+
+        function updateClickProgress() {
+            const progressBar = document.getElementById('clickProgressBar');
+            progressBar.style.width = (clicksLeft / 1000) * 100 + '%';
+        }
+
+        window.onload = function() {
+            document.getElementById('counter').innerText = count;
+            updateClickProgress();
+        };
+    </script>
+</body>
+</html>
