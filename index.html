@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        /* Стилі не змінювалися */
+        /* Основні стилі */
         body {
             display: flex;
             flex-direction: column;
@@ -27,9 +27,85 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        /* Інші стилі залишаються без змін */
-        
-        /* Нові стилі для меню рефералів */
+
+        /* Стилі для екрану Clicker */
+        .counter {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .burger-button {
+            background: url('https://imgur.com/a/jTbqeRF.png') no-repeat center center;
+            background-size: cover;
+            width: 100px;
+            height: 100px;
+            border: none;
+            cursor: pointer;
+        }
+        .click-progress {
+            width: 80%;
+            height: 20px;
+            background-color: #333;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+        .click-progress-bar {
+            height: 100%;
+            background-color: #FFD700;
+            width: 100%;
+            border-radius: 10px;
+        }
+        .click-count {
+            font-size: 18px;
+            color: #FFD700;
+        }
+
+        /* Стилі для екрану NFT */
+        .nft-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nft-box {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .nft-image {
+            width: 100px;
+            height: 100px;
+            background-color: #555;
+            margin-right: 15px;
+            border-radius: 10px;
+        }
+        .nft-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #FFD700;
+        }
+        .nft-price {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .price-change {
+            color: lightgreen;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .buy-button {
+            background-color: #4682B4;
+            color: white;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Стилі для екрану рефералів */
         .referral-container {
             display: none;
             flex-direction: column;
@@ -98,6 +174,24 @@
         .friend-item img {
             width: 50px;
             margin-right: 10px;
+        }
+
+        /* Стилі для нижнього меню */
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            background-color: #222;
+            padding: 10px 0;
+        }
+        .menu button {
+            background: none;
+            border: none;
+            color: #FFD700;
+            font-size: 18px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -171,78 +265,93 @@
         let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
         let clickLimit = 1000;
         let clicksLeft = clickLimit;
-        let friendsList = JSON.parse(localStorage.getItem('friendsList')) || [];
+        let friendsList = JSON.parse(localStorage.getItem('friendsList')) || ["Friend 1", "Friend 2"];
 
         function setNickname() {
-            document.getElementById('nickname').innerText = "User Name";
+            const nickname = "User Name"; // тут можна підключити ім'я користувача з Telegram API
+            document.getElementById("nickname").textContent = nickname;
         }
 
-        function updateCounterDisplay() {
-            document.getElementById('counter').innerText = count;
+        function showClicker() {
+            document.getElementById("clickerScreen").style.display = "flex";
+            document.getElementById("nftScreen").style.display = "none";
+            document.getElementById("referralScreen").style.display = "none";
+        }
+
+        function showNFT() {
+            document.getElementById("clickerScreen").style.display = "none";
+            document.getElementById("nftScreen").style.display = "flex";
+            document.getElementById("referralScreen").style.display = "none";
+        }
+
+        function showReferrals() {
+            document.getElementById("clickerScreen").style.display = "none";
+            document.getElementById("nftScreen").style.display = "none";
+            document.getElementById("referralScreen").style.display = "flex";
         }
 
         function incrementCounter() {
             if (clicksLeft > 0) {
-                count += 1;
-                clicksLeft -= 1;
+                count++;
+                clicksLeft--;
                 updateCounterDisplay();
                 updateClickProgress();
                 localStorage.setItem('counter', count);
-                localStorage.setItem('clicksLeft', clicksLeft);
             }
         }
 
+        function updateCounterDisplay() {
+            document.getElementById("counter").textContent = count;
+            document.getElementById("clickCountDisplay").textContent = clicksLeft;
+        }
+
         function updateClickProgress() {
-            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
-            document.getElementById('clickCountDisplay').innerText = clicksLeft;
+            const progress = (clicksLeft / clickLimit) * 100;
+            document.getElementById("clickProgressBar").style.width = progress + "%";
         }
 
         setInterval(() => {
             if (clicksLeft < clickLimit) {
-                clicksLeft += 1;
+                clicksLeft++;
                 updateClickProgress();
+                document.getElementById("clickCountDisplay").textContent = clicksLeft;
             }
         }, 1000);
 
-        function showClicker() {
-            document.getElementById('clickerScreen').style.display = 'flex';
-            document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('referralScreen').style.display = 'none';
-        }
-
-        function showNFT() {
-            document.getElementById('clickerScreen').style.display = 'none';
-            document.getElementById('nftScreen').style.display = 'flex';
-            document.getElementById('referralScreen').style.display = 'none';
-        }
-
-        function showReferrals() {
-            document.getElementById('clickerScreen').style.display = 'none';
-            document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('referralScreen').style.display = 'flex';
-            updateFriendsList();
-        }
-
-        function copyInviteLink() {
-            navigator.clipboard.writeText("https://example.com/invite").then(() => {
-                alert("Invite link copied!");
-            });
-        }
-
-        function addFriend(name, imgSrc) {
-            friendsList.push({name, imgSrc});
-            localStorage.setItem('friendsList', JSON.stringify(friendsList));
-            updateFriendsList();
+        function buyOrSellNFT(id) {
+            const price = nftPrices[id];
+            if (!hasNFT[id] && count >= price) {
+                count -= price;
+                hasNFT[id] = true;
+                purchasePrices[id] = price;
+                document.getElementById(`buyButton${id}`).textContent = "SELL";
+            } else if (hasNFT[id]) {
+                count += price;
+                hasNFT[id] = false;
+                purchasePrices[id] = null;
+                document.getElementById(`buyButton${id}`).textContent = "BUY";
+            }
+            updateCounterDisplay();
+            localStorage.setItem('counter', count);
+            localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
+            localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
         }
 
         function updateFriendsList() {
-            const friendsListContainer = document.getElementById('friendsList');
-            friendsListContainer.innerHTML = '';
+            const listElement = document.getElementById("friendsList");
+            listElement.innerHTML = "";
             friendsList.forEach(friend => {
-                const friendItem = document.createElement('div');
-                friendItem.classList.add('friend-item');
-                friendItem.innerHTML = `<img src="${friend.imgSrc}" alt="Friend Avatar"><span>${friend.name}</span>`;
-                friendsListContainer.appendChild(friendItem);
+                const friendItem = document.createElement("div");
+                friendItem.classList.add("friend-item");
+                friendItem.innerHTML = `<img src="https://i.imgur.com/VtVDfFc.png" alt="Avatar"><span>${friend}</span>`;
+                listElement.appendChild(friendItem);
+            });
+        }
+
+        function copyInviteLink() {
+            const inviteLink = "https://telegram.me/your_bot?start=referral_code";
+            navigator.clipboard.writeText(inviteLink).then(() => {
+                alert("Invite link copied!");
             });
         }
 
