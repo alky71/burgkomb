@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
+        /* Стилі не змінювалися */
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: black;
@@ -21,16 +22,16 @@
             margin-top: 20px;
             text-align: center;
             color: #FFD700;
-        }
-        .header-image {
-            width: 100%;
-            height: 200px;
-            background-size: cover;
-            background-position: center;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .counter {
             font-size: 60px;
             font-weight: bold;
+            text-align: center;
+            color: white;
             margin-top: 20px;
         }
         .click-progress {
@@ -39,45 +40,104 @@
             background-color: #333;
             border-radius: 10px;
             margin-top: 10px;
+            position: relative;
         }
         .click-progress-bar {
             height: 100%;
             background-color: #00bfff;
             border-radius: 10px;
+            transition: width 0.1s ease;
         }
-        .nft-container, .referral-container {
+        .click-count {
+            font-size: 18px;
+            color: #FFD700;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .burger-button {
+            width: 250px;
+            height: 250px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease;
+        }
+        .burger-button:active {
+            transform: scale(1.1);
+        }
+        .burger-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .nft-container {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
             width: 100%;
             height: 100vh;
-            padding-top: 20px;
+            background-color: black;
+            color: white;
+            padding-top: 50px;
         }
         .nft-box {
-            margin: 20px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #FFD700;
+            border-radius: 15px;
             padding: 20px;
-            background-color: #222;
-            border-radius: 10px;
-            text-align: center;
+            margin-top: 10px;
+        }
+        .nft-image {
+            width: 200px;
+            height: 200px;
+            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-size: cover;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        .nft-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .nft-price {
             font-size: 30px;
             color: #FFD700;
+            margin-bottom: 10px;
         }
         .price-change {
             font-size: 20px;
-            margin-top: 10px;
+            margin-top: 5px;
+            text-align: center;
         }
-        .positive-change {
-            color: green;
+        .buy-button {
+            background-color: #ccff00;
+            color: black;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .negative-change {
-            color: red;
+        .buy-button:focus {
+            outline: none;
+            box-shadow: none;
         }
         .menu {
             position: fixed;
-            bottom: 0;
+            bottom: 50px;
             width: 100%;
             display: flex;
             justify-content: space-around;
@@ -90,20 +150,27 @@
             color: white;
             font-size: 20px;
             padding: 15px 0;
+            cursor: pointer;
+            outline: none;
         }
-        .menu button.active {
-            background-color: #00bfff;
+        .menu button:focus {
+            outline: none;
+        }
+        .positive-change {
+            color: green;
+        }
+        .negative-change {
+            color: red;
         }
     </style>
 </head>
 <body>
     <div class="nickname" id="nickname">User Name</div>
-    <div class="header-image" id="headerImage"></div>
 
     <!-- Clicker Screen -->
     <div id="clickerScreen">
         <div class="counter" id="counter">0</div>
-        <button onclick="incrementCounter()">Click!</button>
+        <button class="burger-button" onclick="incrementCounter()"></button>
         <div class="click-progress">
             <div class="click-progress-bar" id="clickProgressBar"></div>
         </div>
@@ -112,83 +179,126 @@
 
     <!-- NFT Screen -->
     <div id="nftScreen" class="nft-container">
-        <div class="nft-box">
-            <div class="nft-price" id="nftPrice0">1000</div>
-            <button onclick="buyOrSellNFT(0)">BUY</button>
-            <div class="price-change" id="priceChange0"></div>
+        <div class="nft-box" data-id="0">
+            <div class="nft-image"></div>
+            <div class="nft-info">
+                <div class="nft-price" id="nftPrice0">1000</div>
+                <button class="buy-button" onclick="buyOrSellNFT(0)" id="buyButton0">BUY</button>
+                <div class="price-change" id="priceChange0"></div>
+            </div>
         </div>
-    </div>
-
-    <!-- Referrals Screen -->
-    <div id="referralScreen" class="referral-container">
-        <h2>Referrals</h2>
-        <input type="text" id="inputReferralCode" placeholder="Enter Code">
-        <button onclick="applyReferral()">Submit</button>
+        <div class="nft-box" data-id="1">
+            <div class="nft-image"></div>
+            <div class="nft-info">
+                <div class="nft-price" id="nftPrice1">10000</div>
+                <button class="buy-button" onclick="buyOrSellNFT(1)" id="buyButton1">BUY</button>
+                <div class="price-change" id="priceChange1"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Menu -->
     <div class="menu">
         <button onclick="showClicker()">Clicker</button>
         <button onclick="showNFT()">NFT</button>
-        <button onclick="showReferrals()">Referrals</button>
     </div>
 
     <script>
-        let count = 0, clicksLeft = 1000;
-        let nftPrices = [1000], purchasePrices = [null], hasNFT = [false];
+        let count = localStorage.getItem('counter') ? parseInt(localStorage.getItem('counter')) : 0;
+        let nftPrices = JSON.parse(localStorage.getItem('nftPrices')) || [1000, 10000];
+        let purchasePrices = JSON.parse(localStorage.getItem('purchasePrices')) || [null, null];
+        let hasNFT = JSON.parse(localStorage.getItem('hasNFT')) || [false, false];
+        let clickLimit = 1000;
+        let clicksLeft = clickLimit;
 
-        function incrementCounter() {
-            if (clicksLeft > 0) {
-                count++;
-                clicksLeft--;
-                updateCounterDisplay();
-                updateClickProgress();
-            }
+        function setNickname() {
+            document.getElementById('nickname').innerText = "User Name";
         }
 
         function updateCounterDisplay() {
             document.getElementById('counter').innerText = count;
         }
 
+        function incrementCounter() {
+            if (clicksLeft > 0) {
+                count += 1;
+                clicksLeft -= 1;
+                updateCounterDisplay();
+                updateClickProgress();
+                localStorage.setItem('counter', count);
+                localStorage.setItem('clicksLeft', clicksLeft);
+            }
+        }
+
         function updateClickProgress() {
-            document.getElementById('clickProgressBar').style.width = (clicksLeft / 1000) * 100 + '%';
+            document.getElementById('clickProgressBar').style.width = (clicksLeft / clickLimit * 100) + '%';
+            document.getElementById('clickCountDisplay').innerText = clicksLeft;
         }
 
-        function updateNFTPrices() {
-            nftPrices.forEach((price, index) => {
-                let newPrice = Math.round(price * (Math.random() * (1.1 - 0.9) + 0.9));
-                let change = ((newPrice - price) / price * 100).toFixed(2);
-                nftPrices[index] = newPrice;
-                document.getElementById(`nftPrice${index}`).innerText = newPrice;
-                document.getElementById(`priceChange${index}`).innerText = `${change}%`;
-                document.getElementById(`priceChange${index}`).className = change >= 0 ? 'positive-change' : 'negative-change';
-            });
-        }
-
-        function buyOrSellNFT(index) {
-            hasNFT[index] = !hasNFT[index];
-        }
+        setInterval(() => {
+            if (clicksLeft < clickLimit) {
+                clicksLeft += 1;
+                updateClickProgress();
+            }
+        }, 1000);
 
         function showClicker() {
-            setActiveMenu('clicker');
+            document.getElementById('clickerScreen').style.display = 'flex';
+            document.getElementById('nftScreen').style.display = 'none';
         }
 
         function showNFT() {
-            setActiveMenu('nft');
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'flex';
         }
 
-        function showReferrals() {
-            setActiveMenu('referral');
+        function updateNFTPrices() {
+            let randomFactor = Math.random() * (1.1 - 0.9) + 0.9;
+            nftPrices = nftPrices.map(price => Math.round(price * randomFactor));
+            nftPrices.forEach((price, index) => {
+                document.getElementById(nftPrice${index}).innerText = price;
+                if (hasNFT[index] && purchasePrices[index] !== null) {
+                    let priceChange = ((price - purchasePrices[index]) / purchasePrices[index] * 100).toFixed(2);
+                    document.getElementById(priceChange${index}).innerText = (priceChange >= 0 ? '+' : '') + priceChange + '%';
+                    document.getElementById(priceChange${index}).className = priceChange >= 0 ? 'price-change positive-change' : 'price-change negative-change';
+                }
+            });
+            localStorage.setItem('nftPrices', JSON.stringify(nftPrices));
         }
 
-        function setActiveMenu(menu) {
-            document.getElementById('clickerScreen').style.display = menu === 'clicker' ? 'block' : 'none';
-            document.getElementById('nftScreen').style.display = menu === 'nft' ? 'block' : 'none';
-            document.getElementById('referralScreen').style.display = menu === 'referral' ? 'block' : 'none';
+        function buyOrSellNFT(index) {
+            const buyButton = document.getElementById(buyButton${index});
+            const priceChangeDisplay = document.getElementById(priceChange${index});
+            if (!hasNFT[index]) {
+                if (count >= nftPrices[index]) {
+                    count -= nftPrices[index];
+                    purchasePrices[index] = nftPrices[index];
+                    hasNFT[index] = true;
+                    buyButton.innerText = 'SELL';
+                    updateCounterDisplay();
+                    priceChangeDisplay.innerText = "0.00%";
+                    priceChangeDisplay.className = 'price-change negative-change';
+                    localStorage.setItem('counter', count);
+                    localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
+                    localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
+                }
+            } else {
+                const profit = nftPrices[index] - purchasePrices[index];
+                count += nftPrices[index];
+                hasNFT[index] = false;
+                buyButton.innerText = 'BUY';
+                priceChangeDisplay.innerText = Profit: ${(profit >= 0 ? '+' : '')}${profit};
+                updateCounterDisplay();
+                localStorage.setItem('counter', count);
+                localStorage.setItem('purchasePrices', JSON.stringify(purchasePrices));
+                localStorage.setItem('hasNFT', JSON.stringify(hasNFT));
+            }
         }
 
-        setInterval(updateNFTPrices, 2000);
-        showClicker();
+        setNickname();
+        updateCounterDisplay();
+        updateClickProgress();
+        setInterval(updateNFTPrices, 1000); // Оновлюємо ціни кожну секунду
     </script>
 </body>
 </html>
