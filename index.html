@@ -183,7 +183,7 @@
     <!-- Bottom Menu -->
     <div class="menu">
         <div class="menu-item" onclick="showClicker()">
-            <img id="clickerIcon" src="https://imgur.com/S6X7ENF.png">
+            <img id="clickerIcon" src="https://i.imgur.com/VtVDfFc.png">
             <span>Clicker</span>
         </div>
         <div class="menu-item" onclick="showNFT()">
@@ -193,6 +193,34 @@
     </div>
 
     <script>
+        let balance = 0;
+        let clicksLeft = 1000;
+        let clickIncrement = 1;
+        let nftPrice = 1000;
+
+        function incrementCounter() {
+            if (clicksLeft > 0) {
+                balance += clickIncrement;
+                clicksLeft--;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('counter').innerText = balance;
+            document.getElementById('clickCountDisplay').innerText = clicksLeft;
+            document.getElementById('clickProgressBar').style.width = `${(clicksLeft / 1000) * 100}%`;
+        }
+
+        function buyOrSellNFT(id) {
+            if (balance >= nftPrice) {
+                balance -= nftPrice;
+                nftPrice += Math.floor(nftPrice * 0.1); // Зміна ціни на 10%
+                updateUI();
+                document.getElementById(`nftPrice${id}`).innerText = nftPrice;
+            }
+        }
+
         function showClicker() {
             document.getElementById('clickerScreen').style.display = 'flex';
             document.getElementById('nftScreen').style.display = 'none';
@@ -206,6 +234,13 @@
             document.getElementById('nftIcon').src = 'https://imgur.com/mqM8QS8.png';
             document.getElementById('clickerIcon').src = 'https://imgur.com/S6X7ENF.png';
         }
+
+        setInterval(() => {
+            if (clicksLeft < 1000) clicksLeft++;
+            updateUI();
+        }, 1000);
+
+        document.addEventListener('DOMContentLoaded', showClicker);
     </script>
 </body>
 </html>
