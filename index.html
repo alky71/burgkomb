@@ -16,6 +16,7 @@
             color: white;
             font-family: Arial, sans-serif;
         }
+
         .nickname {
             font-size: 20px;
             margin-top: 20px;
@@ -26,6 +27,7 @@
             left: 50%;
             transform: translateX(-50%);
         }
+
         .counter {
             font-size: 60px;
             font-weight: bold;
@@ -33,6 +35,7 @@
             color: white;
             margin-top: 20px;
         }
+
         .click-progress {
             width: 250px;
             height: 25px;
@@ -41,22 +44,25 @@
             margin-top: 10px;
             position: relative;
         }
+
         .click-progress-bar {
             height: 100%;
             background-color: #00bfff;
             border-radius: 10px;
             transition: width 0.1s ease;
         }
+
         .click-count {
             font-size: 18px;
             color: #FFD700;
             margin-top: 5px;
             text-align: center;
         }
+
         .burger-button {
             width: 250px;
             height: 250px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png');
+            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Активне зображення Clicker */
             background-size: cover;
             border: none;
             border-radius: 50%;
@@ -68,9 +74,11 @@
             -webkit-tap-highlight-color: transparent;
             transition: transform 0.1s ease;
         }
+
         .burger-button:active {
             transform: scale(1.1);
         }
+
         .nft-container {
             display: none;
             flex-direction: column;
@@ -82,6 +90,7 @@
             color: white;
             padding-top: 50px;
         }
+
         .nft-box {
             display: flex;
             flex-direction: row;
@@ -92,24 +101,46 @@
             padding: 20px;
             margin-top: 10px;
         }
+
         .nft-image {
             width: 200px;
             height: 200px;
-            background-image: url('https://imgur.com/mqM8QS8.png');
+            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Зображення NFT */
             background-size: cover;
             border-radius: 50%;
             margin-right: 20px;
         }
+
         .nft-info {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         .nft-price {
             font-size: 30px;
             color: #FFD700;
             margin-bottom: 10px;
         }
+
+        .price-change {
+            font-size: 20px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .buy-button {
+            background-color: #ccff00;
+            color: black;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         .menu {
             position: fixed;
             bottom: 50px;
@@ -118,20 +149,37 @@
             justify-content: space-around;
             background-color: #333;
         }
-        .menu-item {
+
+        .menu button {
+            flex: 1;
+            background-color: #444;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 15px 0;
+            cursor: pointer;
+            outline: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: pointer;
         }
-        .menu-item img {
-            width: 50px;
-            height: 50px;
+
+        .menu img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
         }
-        .menu-item span {
-            color: white;
-            font-size: 14px;
-            margin-top: 5px;
+
+        .menu button:focus {
+            outline: none;
+        }
+
+        .positive-change {
+            color: green;
+        }
+
+        .negative-change {
+            color: red;
         }
     </style>
 </head>
@@ -154,71 +202,34 @@
             <div class="nft-image"></div>
             <div class="nft-info">
                 <div class="nft-price" id="nftPrice0">1000</div>
-                <button class="buy-button" onclick="buyNFT()">BUY</button>
+                <button class="buy-button" onclick="buyOrSellNFT(0)" id="buyButton0">BUY</button>
+                <div class="price-change" id="priceChange0"></div>
+            </div>
+        </div>
+        <div class="nft-box" data-id="1">
+            <div class="nft-image"></div>
+            <div class="nft-info">
+                <div class="nft-price" id="nftPrice1">10000</div>
+                <button class="buy-button" onclick="buyOrSellNFT(1)" id="buyButton1">BUY</button>
+                <div class="price-change" id="priceChange1"></div>
             </div>
         </div>
     </div>
 
     <!-- Bottom Menu -->
     <div class="menu">
-        <div class="menu-item" onclick="showClicker()">
-            <img id="clickerIcon" src="https://i.imgur.com/VtVDfFc.png">
-            <span>Clicker</span>
-        </div>
-        <div class="menu-item" onclick="showNFT()">
-            <img id="nftIcon" src="https://imgur.com/zM9mVrO.png">
-            <span>NFT</span>
-        </div>
+        <button id="clickerMenuButton" onclick="showClicker()">
+            <img src="https://i.imgur.com/VtVDfFc.png" id="clickerMenuIcon" alt="Clicker Menu">
+            Clicker
+        </button>
+        <button id="nftMenuButton" onclick="showNFT()">
+            <img src="https://imgur.com/zM9mVrO.png" id="nftMenuIcon" alt="NFT Menu">
+            NFT
+        </button>
     </div>
 
     <script>
-        let balance = 0;
-        let clicksLeft = 1000;
-        let nftPrice = 1000;
-
-        function incrementCounter() {
-            if (clicksLeft > 0) {
-                balance += 1;
-                clicksLeft--;
-                updateUI();
-            }
-        }
-
-        function buyNFT() {
-            if (balance >= nftPrice) {
-                balance -= nftPrice;
-                nftPrice += Math.ceil(nftPrice * 0.1);
-                updateUI();
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('counter').innerText = balance;
-            document.getElementById('clickCountDisplay').innerText = clicksLeft;
-            document.getElementById('clickProgressBar').style.width = `${(clicksLeft / 1000) * 100}%`;
-            document.getElementById('nftPrice0').innerText = nftPrice;
-        }
-
-        function showClicker() {
-            document.getElementById('clickerScreen').style.display = 'flex';
-            document.getElementById('nftScreen').style.display = 'none';
-            document.getElementById('clickerIcon').src = 'https://i.imgur.com/VtVDfFc.png';
-            document.getElementById('nftIcon').src = 'https://imgur.com/zM9mVrO.png';
-        }
-
-        function showNFT() {
-            document.getElementById('clickerScreen').style.display = 'none';
-            document.getElementById('nftScreen').style.display = 'flex';
-            document.getElementById('nftIcon').src = 'https://imgur.com/mqM8QS8.png';
-            document.getElementById('clickerIcon').src = 'https://imgur.com/S6X7ENF.png';
-        }
-
-        setInterval(() => {
-            if (clicksLeft < 1000) clicksLeft++;
-            updateUI();
-        }, 1000);
-
-        document.addEventListener('DOMContentLoaded', showClicker);
+        // Основний функціонал
     </script>
 </body>
 </html>
