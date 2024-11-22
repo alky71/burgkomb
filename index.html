@@ -71,10 +71,6 @@
         .burger-button:active {
             transform: scale(1.1);
         }
-        .burger-button:focus {
-            outline: none;
-            box-shadow: none;
-        }
         .nft-container {
             display: none;
             flex-direction: column;
@@ -99,7 +95,7 @@
         .nft-image {
             width: 200px;
             height: 200px;
-            background-image: url('https://i.imgur.com/mqM8QS8.png');
+            background-image: url('https://imgur.com/mqM8QS8.png');
             background-size: cover;
             border-radius: 50%;
             margin-right: 20px;
@@ -113,22 +109,6 @@
             font-size: 30px;
             color: #FFD700;
             margin-bottom: 10px;
-        }
-        .price-change {
-            font-size: 20px;
-            margin-top: 5px;
-            text-align: center;
-        }
-        .buy-button {
-            background-color: #ccff00;
-            color: black;
-            font-size: 20px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
         .menu {
             position: fixed;
@@ -174,8 +154,7 @@
             <div class="nft-image"></div>
             <div class="nft-info">
                 <div class="nft-price" id="nftPrice0">1000</div>
-                <button class="buy-button" onclick="buyOrSellNFT(0)" id="buyButton0">BUY</button>
-                <div class="price-change" id="priceChange0"></div>
+                <button class="buy-button" onclick="buyNFT()">BUY</button>
             </div>
         </div>
     </div>
@@ -195,13 +174,20 @@
     <script>
         let balance = 0;
         let clicksLeft = 1000;
-        let clickIncrement = 1;
         let nftPrice = 1000;
 
         function incrementCounter() {
             if (clicksLeft > 0) {
-                balance += clickIncrement;
+                balance += 1;
                 clicksLeft--;
+                updateUI();
+            }
+        }
+
+        function buyNFT() {
+            if (balance >= nftPrice) {
+                balance -= nftPrice;
+                nftPrice += Math.ceil(nftPrice * 0.1);
                 updateUI();
             }
         }
@@ -210,15 +196,7 @@
             document.getElementById('counter').innerText = balance;
             document.getElementById('clickCountDisplay').innerText = clicksLeft;
             document.getElementById('clickProgressBar').style.width = `${(clicksLeft / 1000) * 100}%`;
-        }
-
-        function buyOrSellNFT(id) {
-            if (balance >= nftPrice) {
-                balance -= nftPrice;
-                nftPrice += Math.floor(nftPrice * 0.1); // Зміна ціни на 10%
-                updateUI();
-                document.getElementById(`nftPrice${id}`).innerText = nftPrice;
-            }
+            document.getElementById('nftPrice0').innerText = nftPrice;
         }
 
         function showClicker() {
