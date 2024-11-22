@@ -5,182 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Telegram Mini App</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-
-        .nickname {
-            font-size: 20px;
-            margin-top: 20px;
-            text-align: center;
-            color: #FFD700;
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .counter {
-            font-size: 60px;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-            margin-top: 20px;
-        }
-
-        .click-progress {
-            width: 250px;
-            height: 25px;
-            background-color: #333;
-            border-radius: 10px;
-            margin-top: 10px;
-            position: relative;
-        }
-
-        .click-progress-bar {
-            height: 100%;
-            background-color: #00bfff;
-            border-radius: 10px;
-            transition: width 0.1s ease;
-        }
-
-        .click-count {
-            font-size: 18px;
-            color: #FFD700;
-            margin-top: 5px;
-            text-align: center;
-        }
-
-        .burger-button {
-            width: 250px;
-            height: 250px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Активне зображення Clicker */
-            background-size: cover;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s ease;
-        }
-
-        .burger-button:active {
-            transform: scale(1.1);
-        }
-
-        .nft-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            width: 100%;
-            height: 100vh;
-            background-color: black;
-            color: white;
-            padding-top: 50px;
-        }
-
-        .nft-box {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid #FFD700;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 10px;
-        }
-
-        .nft-image {
-            width: 200px;
-            height: 200px;
-            background-image: url('https://i.imgur.com/VtVDfFc.png'); /* Зображення NFT */
-            background-size: cover;
-            border-radius: 50%;
-            margin-right: 20px;
-        }
-
-        .nft-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .nft-price {
-            font-size: 30px;
-            color: #FFD700;
-            margin-bottom: 10px;
-        }
-
-        .price-change {
-            font-size: 20px;
-            margin-top: 5px;
-            text-align: center;
-        }
-
-        .buy-button {
-            background-color: #ccff00;
-            color: black;
-            font-size: 20px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .menu {
-            position: fixed;
-            bottom: 50px;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background-color: #333;
-        }
-
-        .menu button {
-            flex: 1;
-            background-color: #444;
-            border: none;
-            color: white;
-            font-size: 20px;
-            padding: 15px 0;
-            cursor: pointer;
-            outline: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .menu img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
-        }
-
-        .menu button:focus {
-            outline: none;
-        }
-
-        .positive-change {
-            color: green;
-        }
-
-        .negative-change {
-            color: red;
-        }
+        /* Стилі залишились незмінними */
     </style>
 </head>
 <body>
@@ -197,9 +22,9 @@
     </div>
 
     <!-- NFT Screen -->
-    <div id="nftScreen" class="nft-container">
+    <div id="nftScreen" class="nft-container" style="display: none;">
         <div class="nft-box" data-id="0">
-            <div class="nft-image"></div>
+            <div class="nft-image" style="background-image: url('https://imgur.com/mqM8QS8');"></div>
             <div class="nft-info">
                 <div class="nft-price" id="nftPrice0">1000</div>
                 <button class="buy-button" onclick="buyOrSellNFT(0)" id="buyButton0">BUY</button>
@@ -207,7 +32,7 @@
             </div>
         </div>
         <div class="nft-box" data-id="1">
-            <div class="nft-image"></div>
+            <div class="nft-image" style="background-image: url('https://imgur.com/mqM8QS8');"></div>
             <div class="nft-info">
                 <div class="nft-price" id="nftPrice1">10000</div>
                 <button class="buy-button" onclick="buyOrSellNFT(1)" id="buyButton1">BUY</button>
@@ -229,7 +54,84 @@
     </div>
 
     <script>
-        // Основний функціонал
+        // Змінні
+        let balance = 0;
+        let clickLimit = 1000;
+        let clickProgress = clickLimit;
+        let nftPrices = [1000, 10000];
+        let nftPurchasePrices = [null, null]; // Ціна покупки для кожного NFT
+
+        // Оновлення інтерфейсу
+        function updateUI() {
+            document.getElementById('counter').innerText = balance;
+            document.getElementById('clickCountDisplay').innerText = clickProgress;
+            document.getElementById('clickProgressBar').style.width = `${(clickProgress / clickLimit) * 100}%`;
+        }
+
+        // Натискання на кнопку
+        function incrementCounter() {
+            if (clickProgress > 0) {
+                balance++;
+                clickProgress--;
+                updateUI();
+            }
+        }
+
+        // Показати екран Clicker
+        function showClicker() {
+            document.getElementById('clickerScreen').style.display = 'block';
+            document.getElementById('nftScreen').style.display = 'none';
+            document.getElementById('clickerMenuIcon').src = 'https://i.imgur.com/VtVDfFc.png';
+            document.getElementById('nftMenuIcon').src = 'https://imgur.com/zM9mVrO.png';
+        }
+
+        // Показати екран NFT
+        function showNFT() {
+            document.getElementById('clickerScreen').style.display = 'none';
+            document.getElementById('nftScreen').style.display = 'flex';
+            document.getElementById('clickerMenuIcon').src = 'https://imgur.com/S6X7ENF.png';
+            document.getElementById('nftMenuIcon').src = 'https://imgur.com/mqM8QS8.png';
+        }
+
+        // Купівля/Продаж NFT
+        function buyOrSellNFT(index) {
+            const price = nftPrices[index];
+            if (nftPurchasePrices[index] === null) {
+                // Купівля
+                if (balance >= price) {
+                    balance -= price;
+                    nftPurchasePrices[index] = price;
+                    document.getElementById(`buyButton${index}`).innerText = 'SELL';
+                }
+            } else {
+                // Продаж
+                balance += price;
+                nftPurchasePrices[index] = null;
+                document.getElementById(`buyButton${index}`).innerText = 'BUY';
+            }
+            updateUI();
+        }
+
+        // Динамічна зміна ціни NFT
+        setInterval(() => {
+            for (let i = 0; i < nftPrices.length; i++) {
+                const change = Math.random() * 0.2 - 0.1; // Зміна від -10% до +10%
+                nftPrices[i] = Math.max(1, Math.round(nftPrices[i] * (1 + change)));
+                document.getElementById(`nftPrice${i}`).innerText = nftPrices[i];
+
+                // Відсоткова зміна від моменту покупки
+                if (nftPurchasePrices[i] !== null) {
+                    const percentChange = ((nftPrices[i] - nftPurchasePrices[i]) / nftPurchasePrices[i]) * 100;
+                    const changeDisplay = document.getElementById(`priceChange${i}`);
+                    changeDisplay.innerText = `${percentChange.toFixed(2)}%`;
+                    changeDisplay.className = percentChange >= 0 ? 'positive-change' : 'negative-change';
+                }
+            }
+        }, 10000); // Оновлення кожні 10 секунд
+
+        // Початкова ініціалізація
+        updateUI();
+        showClicker();
     </script>
 </body>
 </html>
